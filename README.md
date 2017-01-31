@@ -25,8 +25,7 @@ To integrate AppRating into your Xcode project using CocoaPods, specify it in yo
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '8.0'
-platform :osx, '10.10'
+platform :ios, '9.0'
 use_frameworks!
 
 pod 'AppRating', '>= 0.0.1'
