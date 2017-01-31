@@ -167,6 +167,15 @@ open class AppRating {
         AppRatingManager.ratingConditionsAlwaysTrue = newstatus;
     }
     
+    /*
+     * Resets all counters. Perfect for testing.
+     */
+    
+    open static func resetAllCounters() {
+        return self.manager.resetAllCounters();
+    }
+
+    
 }
 
 open class AppRatingManager {
@@ -236,10 +245,12 @@ open class AppRatingManager {
             self.dontRate()
         }))
         if (showsRemindButton()) {
-            alertView.addAction(UIAlertAction(title: defaultRemindButtonTitle()!, style:UIAlertActionStyle.default, handler: {
-                (alert: UIAlertAction!) in
-                self.remindMeLater()
-            }))
+            if let defaultremindtitle = defaultRemindButtonTitle() {
+                alertView.addAction(UIAlertAction(title: defaultremindtitle, style:UIAlertActionStyle.default, handler: {
+                    (alert: UIAlertAction!) in
+                    self.remindMeLater()
+                }))
+            }
         }
         alertView.addAction(UIAlertAction(title: defaultRateButtonTitle(), style:UIAlertActionStyle.default, handler: {
             (alert: UIAlertAction!) in
@@ -439,7 +450,7 @@ open class AppRatingManager {
     }
     
     fileprivate func userHasDeclinedToRate() -> Bool {
-        return userDefaultsObject.bool(forKey: keyForAppRatingKeyString(appratingDeclinedToRate));
+        return userDefaultsObject.bool(forKey: keyForAppRatingKeyString(appratingKeyDeclinedToRate));
     }
     
     fileprivate func userHasRatedCurrentVersion() -> Bool {
@@ -463,7 +474,7 @@ open class AppRatingManager {
         }
         
         // Get the version number that we've been tracking thus far
-        let currentVersionKey = keyForAppRatingKeyString(appratingRatedCurrentVersion)
+        let currentVersionKey = keyForAppRatingKeyString(appratingCurrentVersion)
         var trackingVersion: String? = userDefaultsObject.string(forKey: currentVersionKey)
         // New install, or changed keys
         if trackingVersion == nil {
@@ -498,25 +509,34 @@ open class AppRatingManager {
         
         userDefaultsObject.synchronize()
         if (ratingConditionsHaveBeenMet()) {
-            rateApp();
+            showRatingAlert();
         }
     }
     
     public func resetAllCounters() {
-        /*let currentVersionKey = keyForArmchairKeyType(ArmchairKey.CurrentVersion)
-        let trackingVersion: String? = StandardUserDefaults().stringForKey(currentVersionKey)
+        debugLog("Reseting all Counters!")
+        resetUsageCounters();
+        
+        let currentVersionKey = keyForAppRatingKeyString(appratingCurrentVersion);
+        let trackingVersion: String? = userDefaultsObject.string(forKey: currentVersionKey)
         let bundleVersionKey = kCFBundleVersionKey as String
         let currentVersion = Bundle.main.object(forInfoDictionaryKey: bundleVersionKey) as? String
         
-        StandardUserDefaults().setObject(trackingVersion as AnyObject?, forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersion))
-        StandardUserDefaults().setObject(StandardUserDefaults().objectForKey(keyForArmchairKeyType(ArmchairKey.RatedCurrentVersion)), forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersionRated))
-        StandardUserDefaults().setObject(StandardUserDefaults().objectForKey(keyForArmchairKeyType(ArmchairKey.DeclinedToRate)), forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersionDeclinedToRate))
-        StandardUserDefaults().setObject(currentVersion as AnyObject?, forKey: currentVersionKey)
-        resetUsageCounters()
-        StandardUserDefaults().setObject(NSNumber(value: false), forKey: keyForArmchairKeyType(ArmchairKey.RatedCurrentVersion))
-        StandardUserDefaults().setObject(NSNumber(value: false), forKey: keyForArmchairKeyType(ArmchairKey.DeclinedToRate))
-        StandardUserDefaults().setObject(NSNumber(value: 0), forKey: keyForArmchairKeyType(ArmchairKey.ReminderRequestDate))
-        StandardUserDefaults().synchronize()*/
+        userDefaultsObject.set(trackingVersion as AnyObject?, forKey: keyForAppRatingKeyString(appratingPreviousVersion))
+        userDefaultsObject.set(userDefaultsObject.object(forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion)), forKey: keyForAppRatingKeyString(appratingRatedPreviousVersion))
+        userDefaultsObject.set(userDefaultsObject.object(forKey: keyForAppRatingKeyString(appratingKeyDeclinedToRate)), forKey: keyForAppRatingKeyString(appratingKeyPreviousDeclinedToRate))
+        userDefaultsObject.set(currentVersion as AnyObject?, forKey: currentVersionKey)
+        
+        userDefaultsObject.set(NSNumber(value: false), forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion))
+        userDefaultsObject.set(NSNumber(value: false), forKey: keyForAppRatingKeyString(appratingKeyDeclinedToRate))
+        userDefaultsObject.set(NSNumber(value: 0), forKey: keyForAppRatingKeyString(appratingReminderRequestDate))
+        userDefaultsObject.synchronize()
+    }
+    
+    public func resetUsageCounters() {
+        userDefaultsObject.set(NSNumber(value: NSDate().timeIntervalSince1970), forKey: keyForAppRatingKeyString(appratingFirstUseDate))
+        userDefaultsObject.set(NSNumber(value: 1), forKey: keyForAppRatingKeyString(appratingUseCount))
+        userDefaultsObject.synchronize()
     }
     
     // MARK: -
@@ -636,11 +656,14 @@ open class AppRatingManager {
     
     // MARK: Tracking Keys with sensible defaults
     
+    fileprivate lazy var appratingCurrentVersion: String = "AppRatingCurrentVersion";
+    fileprivate lazy var appratingPreviousVersion: String = "AppRatingPreviousVersion";
+    fileprivate lazy var appratingRatedCurrentVersion: String = "AppRatingRatedCurrentVersion";
+    fileprivate lazy var appratingRatedPreviousVersion: String = "AppRatingRatedPreviousVersion";
     fileprivate lazy var appratingKeyDeclinedToRate: String = "AppRatingKeyDeclinedToRate";
+    fileprivate lazy var appratingKeyPreviousDeclinedToRate: String = "AppRatingPreviousKeyDeclinedToRate";
     fileprivate lazy var appratingReminderRequestDate: String = "AppRatingReminderRequestDate";
     fileprivate lazy var appratingFirstUseDate: String = "AppRatingFirstUseDate";
-    fileprivate lazy var appratingDeclinedToRate: String = "AppRatingDeclinedToRate";
-    fileprivate lazy var appratingRatedCurrentVersion: String = "AppRatingRatedCurrentVersion";
     fileprivate lazy var appratingRatedAnyVersion: String = "AppRatingRatedAnyVersion";
     fileprivate lazy var appratingUseCount: String = "AppRatingUseCount";
     
