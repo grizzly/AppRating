@@ -596,7 +596,6 @@ open class AppRatingManager {
                 bundle = Bundle(for: type(of: self))
             }
         }
-        
         return bundle
     }
     

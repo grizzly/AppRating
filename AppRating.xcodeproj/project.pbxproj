@@ -11,6 +11,9 @@
 		784E93F91E40CE7D00A7FF46 /* AppRatingLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 784E93D81E40CE7D00A7FF46 /* AppRatingLocalizable.strings */; };
 		784E93FA1E40CF0700A7FF46 /* AppRatingLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 784E93D81E40CE7D00A7FF46 /* AppRatingLocalizable.strings */; };
 		784E93FB1E40CF0900A7FF46 /* AppRatingLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 784E93D81E40CE7D00A7FF46 /* AppRatingLocalizable.strings */; };
+		78C2115F1E40E2BA00A7B0C8 /* AppRating.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 78C2115E1E40E2BA00A7B0C8 /* AppRating.bundle */; };
+		78C211611E40E76000A7B0C8 /* AppRating.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 78C2115E1E40E2BA00A7B0C8 /* AppRating.bundle */; };
+		78C211621E40E76000A7B0C8 /* AppRating.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 78C2115E1E40E2BA00A7B0C8 /* AppRating.bundle */; };
 		78DA886E1E3F97ED00F6FAB3 /* AppRating.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78DA88641E3F97EC00F6FAB3 /* AppRating.framework */; };
 		78DA88731E3F97ED00F6FAB3 /* AppRatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DA88721E3F97ED00F6FAB3 /* AppRatingTests.swift */; };
 		78DA88751E3F97ED00F6FAB3 /* AppRating.h in Headers */ = {isa = PBXBuildFile; fileRef = 78DA88671E3F97EC00F6FAB3 /* AppRating.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -85,6 +88,8 @@
 		784E93F51E40CE7D00A7FF46 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/AppRatingLocalizable.strings; sourceTree = "<group>"; };
 		784E93F71E40CE7D00A7FF46 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AppRatingLocalizable.strings"; sourceTree = "<group>"; };
 		784E93F81E40CE7D00A7FF46 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AppRatingLocalizable.strings"; sourceTree = "<group>"; };
+		78C2115E1E40E2BA00A7B0C8 /* AppRating.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AppRating.bundle; sourceTree = "<group>"; };
+		78C211601E40E42700A7B0C8 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/AppRatingLocalizable.strings; sourceTree = "<group>"; };
 		78DA88641E3F97EC00F6FAB3 /* AppRating.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AppRating.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		78DA88671E3F97EC00F6FAB3 /* AppRating.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppRating.h; sourceTree = "<group>"; };
 		78DA88681E3F97EC00F6FAB3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -138,6 +143,7 @@
 		78DA885A1E3F97EC00F6FAB3 = {
 			isa = PBXGroup;
 			children = (
+				78C2115E1E40E2BA00A7B0C8 /* AppRating.bundle */,
 				784E93D71E40CE7D00A7FF46 /* Localization */,
 				78DA88661E3F97EC00F6FAB3 /* AppRating */,
 				78DA88711E3F97ED00F6FAB3 /* AppRatingTests */,
@@ -341,6 +347,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78C2115F1E40E2BA00A7B0C8 /* AppRating.bundle in Resources */,
 				784E93F91E40CE7D00A7FF46 /* AppRatingLocalizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -349,6 +356,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78C211611E40E76000A7B0C8 /* AppRating.bundle in Resources */,
 				784E93FB1E40CF0900A7FF46 /* AppRatingLocalizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -357,6 +365,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78C211621E40E76000A7B0C8 /* AppRating.bundle in Resources */,
 				784E93FA1E40CF0700A7FF46 /* AppRatingLocalizable.strings in Resources */,
 				78FF83EC1E40C10200C9DAAB /* LaunchScreen.storyboard in Resources */,
 				78FF83E91E40C10200C9DAAB /* Assets.xcassets in Resources */,
@@ -442,6 +451,7 @@
 				784E93F51E40CE7D00A7FF46 /* tr */,
 				784E93F71E40CE7D00A7FF46 /* zh-Hans */,
 				784E93F81E40CE7D00A7FF46 /* zh-Hant */,
+				78C211601E40E42700A7B0C8 /* vi */,
 			);
 			name = AppRatingLocalizable.strings;
 			sourceTree = "<group>";
