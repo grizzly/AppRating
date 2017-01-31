@@ -1,10 +1,8 @@
-![AppRating: A simple yet powerful App Review Manager for iOS in Swift3](https://raw.githubusercontent.com/UrbanApps/Armchair/assets/armchair.png)
-
-Armchair is a simple yet powerful App Review Manager for iOS and OSX written in Swift. It is based on [Armchair](https://raw.githubusercontent.com/UrbanApps/Armchair/) but mainly rewritten for Swift3.
+AppRating is a simple yet powerful App Review Manager for iOS and OSX written in Swift. It is based on [Armchair](https://raw.githubusercontent.com/UrbanApps/Armchair/) but mainly rewritten for Swift3.
 
 ## Why AppRating?
 
-The average end-user will only write a review if something is wrong with your App. This leads to an unfairly negative skew in the ratings, when the majority of satisfied customers don’t leave reviews and only the dissatisfied ones do. In order to counter-balance the negatives, Armchair prompts the user to write a review, but only after the developer knows they are satisfied. For example, you may only show the popup if the user has been using it for more than a week, and has done at least 5 significant events (the core functionality of your App). The rules are fully customizable for your App and easy to setup.
+The average end-user will only write a review if something is wrong with your App. This leads to an unfairly negative skew in the ratings, when the majority of satisfied customers don’t leave reviews and only the dissatisfied ones do. In order to counter-balance the negatives, AppRating prompts the user to write a review, but only after the developer knows they are satisfied. For example, you may only show the popup if the user has been using it for more than a week, and has done at least 5 significant events (the core functionality of your App). The rules are fully customizable for your App and easy to setup.
 
 ## Requirements
 
@@ -47,23 +45,23 @@ $ pod install
 AppRating includes sensible defaults as well as reads data from your localized, or unlocalized `info.plist` to set itself up. While everything is configurable, the only **required** item to configure is your App Store ID. This call should be made as part of your App Delegate's `initialize()` function
 
 ```swift
-Armchair.appID("12345678")
+AppRating.appID("12345678")
 ```
 
-That's it to get started. Setting Armchair up with this line uses some sensible default criterion (detailed below) and will present a rating prompt whenever they are met.
+That's it to get started. Setting AppRating up with this line uses some sensible default criterion (detailed below) and will present a rating prompt whenever they are met.
 
 
 ## What's Planned?
 
-There are some ideas we have for future versions of Armchair. Feel free to fork/implement if you would like to expedite the process.
+There are some ideas we have for future versions of AppRating. Feel free to fork/implement if you would like to expedite the process.
 
 - Get 100% Unit Test coverage
 - Add additional localizations: ongoing
 - [Your idea](https://github.com/grizzly/AppRating/issues)
 
 ## Bugs / Pull Requests
-Let us know if you see ways to improve Armchair or see something wrong with it. We are happy to pull in pull requests that have clean code, and have features that are useful for most people. While the Swift community is still deciding on proper code structure and style, please refrain from simple style complaints (space > tabs, etc...)
+Let us know if you see ways to improve AppRating or see something wrong with it. We are happy to pull in pull requests that have clean code, and have features that are useful for most people. While the Swift community is still deciding on proper code structure and style, please refrain from simple style complaints (space > tabs, etc...)
 
 ## License
 
-Armchair is released under an MIT license. See [LICENSE](https://github.com/grizzly/AppRating/blob/master/LICENSE) for more information
+AppRating is released under an MIT license. See [LICENSE](https://github.com/grizzly/AppRating/blob/master/LICENSE) for more information
