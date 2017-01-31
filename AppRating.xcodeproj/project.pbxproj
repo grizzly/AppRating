@@ -402,6 +402,7 @@
 				78DA887A1E3F97ED00F6FAB3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		78DA887B1E3F97ED00F6FAB3 /* Build configuration list for PBXNativeTarget "AppRatingTests" */ = {
 			isa = XCConfigurationList;
@@ -410,6 +411,7 @@
 				78DA887D1E3F97ED00F6FAB3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
