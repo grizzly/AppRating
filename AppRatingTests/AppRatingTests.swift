@@ -30,11 +30,11 @@ class AppRatingTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        AppRating.appID = self.appID;
+        AppRating.appID(self.appID);
     }
     
     func testAppIDSetProperly() {
-        XCTAssertEqual(AppRating.appID, appID, "appID should be as set")
+        XCTAssertEqual(AppRating.manager.appID, appID, "appID should be as set")
     }
     
     override func tearDown() {

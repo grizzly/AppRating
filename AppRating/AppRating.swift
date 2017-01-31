@@ -30,9 +30,14 @@ import SystemConfiguration
 
 open class AppRating {
     
-    static var appID : String = "";
+    private static var appID : String = "";
     
     // Getters and Setters
+    
+    static func appID(_ appID: String) {
+        AppRating.appID = appID
+        AppRating.manager.appID = appID
+    }
     
     static let manager : AppRatingManager = {
         assert(AppRating.appID != "", "AppRating.appID(appID: String) has to be the first AppRating call made.")
@@ -42,9 +47,14 @@ open class AppRating {
         return Singleton.instance;
     }()
     
-    public func appID(_ appID: String) {
-        AppRating.appID = appID
-        AppRating.manager.appID = appID
+    static func rate() {
+        AppRating.manager.rateApp();
+    }
+    
+    static func showRatingAlert() {
+        DispatchQueue.main.async {
+            AppRating.manager.showRatingAlert()
+        }
     }
     
     /*
@@ -53,11 +63,11 @@ open class AppRating {
      * Default => 3
      */
     
-    public func daysUntilPrompt() -> Int {
+    static func daysUntilPrompt() -> Int {
         return AppRating.manager.daysUntilPrompt
     }
     
-    public func daysUntilPrompt(_ daysUntilPrompt: Int) {
+    static func daysUntilPrompt(_ daysUntilPrompt: Int) {
         AppRating.manager.daysUntilPrompt = daysUntilPrompt
     }
     
@@ -139,18 +149,122 @@ open class AppRatingManager {
     public var usesUntilPrompt : Int = 3;
     public var daysBeforeReminding : Int = 1;
     public var tracksNewVersions : Bool = true;
+    public var shouldPromptIfRated : Bool = true;
     public var useMainAppBundleForLocalizations : Bool = false;
+    public var usesAnimation : Bool = true;
+    public var tintColor : UIColor?;
     
+    static var debugEnabled : Bool = false;
+    static var ratingConditionsAlwaysTrue: Bool = false;
+    
+    fileprivate var userDefaultsObject = UserDefaults.standard;
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
     fileprivate var currentVersion = Bundle.main.object(forInfoDictionaryKey: kCFBundleVersionKey as String) as? String
+    fileprivate var ratingAlert: UIAlertController? = nil
+    fileprivate let reviewURLTemplate  = "https://itunes.apple.com/us/app/x/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
+    
+    // MARK: Optional Closures
+    public typealias AppRatingClosure = () -> ()
+    var didDisplayAlertClosure: AppRatingClosure?
+    var didDeclineToRateClosure: AppRatingClosure?
+    var didOptToRateClosure: AppRatingClosure?
+    var didOptToRemindLaterClosure: AppRatingClosure?
+    
     
     init(appID: String) {
         self.appID = appID;
+        setupNotifications();
     }
     
+    public func rateApp() {
+        
+        userDefaultsObject.set(true, forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion));
+        userDefaultsObject.set(true, forKey: keyForAppRatingKeyString(appratingRatedAnyVersion));
+        userDefaultsObject.synchronize()
+        
+        if (defaultOpensInStoreKit()) {
+            UIApplication.shared.openURL(URL(string: reviewURLString())!)
+        } else {
+            UIApplication.shared.openURL(URL(string: reviewURLString())!)
+        }
+    }
+    
+    // MARK: Singleton Instance Setup
+    
+    fileprivate func setupNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.appWillResignActive(_:)),            name: NSNotification.Name.UIApplicationWillResignActive,    object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationDidFinishLaunching(_:)),  name: NSNotification.Name.UIApplicationDidFinishLaunching,  object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationWillEnterForeground(_:)), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
+    }
     
     // MARK: -
     // MARK: PRIVATE Functions
+    
+    fileprivate func showRatingAlert() {
+        
+        let alertView : UIAlertController = UIAlertController(title: defaultReviewTitle(), message: defaultReviewMessage(), preferredStyle: UIAlertControllerStyle.alert)
+        alertView.addAction(UIAlertAction(title: defaultCancelButtonTitle(), style:UIAlertActionStyle.cancel, handler: {
+            (alert: UIAlertAction!) in
+            self.dontRate()
+        }))
+        if (showsRemindButton()) {
+            alertView.addAction(UIAlertAction(title: defaultRemindButtonTitle()!, style:UIAlertActionStyle.default, handler: {
+                (alert: UIAlertAction!) in
+                self.remindMeLater()
+            }))
+        }
+        alertView.addAction(UIAlertAction(title: defaultRateButtonTitle(), style:UIAlertActionStyle.default, handler: {
+            (alert: UIAlertAction!) in
+            self._rateApp()
+        }))
+        
+        // get the top most controller (= the StoreKit Controller) and dismiss it
+        if let presentingController = UIApplication.shared.keyWindow?.rootViewController {
+            if let topController = topMostViewController(presentingController) {
+                topController.present(alertView, animated: usesAnimation) {
+                    self.debugLog("presentViewController() completed")
+                }
+            }
+            // note that tint color has to be set after the controller is presented in order to take effect (last checked in iOS 9.3)
+            alertView.view.tintColor = tintColor
+        }
+        self.ratingAlert = alertView;
+        
+    }
+    
+    private func hideRatingAlert() {
+        if let alert = ratingAlert {
+            alert.dismiss(animated: false, completion: nil);
+            ratingAlert = nil
+        }
+    }
+    
+    private func dontRate() {
+        userDefaultsObject.set(true, forKey: keyForAppRatingKeyString(self.appratingKeyDeclinedToRate));
+        userDefaultsObject.synchronize();
+        if let closure = didDeclineToRateClosure {
+            closure()
+        }
+    }
+    
+    private func remindMeLater() {
+        userDefaultsObject.set(Date().timeIntervalSince1970, forKey: keyForAppRatingKeyString(self.appratingReminderRequestDate));
+        userDefaultsObject.synchronize()
+        if let closure = didOptToRemindLaterClosure {
+            closure()
+        }
+    }
+    
+    private func _rateApp() {
+        rateApp()
+        if let closure = didOptToRateClosure {
+            closure()
+        }
+    }
+    
+    fileprivate func showsRemindButton() -> Bool {
+        return true;
+    }
     
     fileprivate func setDefaults() {
         self.appName = self.defaultAppName();
@@ -236,6 +350,187 @@ open class AppRatingManager {
         return title
     }
     
+    fileprivate func ratingConditionsHaveBeenMet() -> Bool {
+        
+        if AppRatingManager.ratingConditionsAlwaysTrue {
+            return true
+        }
+        
+        if appID.isEmpty {
+            debugLog("ratingConditionsHaveBeenMet: appID empty!")
+            return false
+        }
+        
+        // check if the app has been used long enough
+        let timeIntervalOfFirstLaunch = userDefaultsObject.double(forKey: keyForAppRatingKeyString(appratingFirstUseDate))
+        let dateOfFirstLaunch = Date(timeIntervalSince1970: timeIntervalOfFirstLaunch)
+        let timeSinceFirstLaunch = Date().timeIntervalSince(dateOfFirstLaunch)
+        let timeUntilRate: TimeInterval = 60 * 60 * 24 * Double(daysUntilPrompt)
+        if timeSinceFirstLaunch < timeUntilRate {
+            debugLog("ratingConditionsHaveBeenMet: app has not been used long enough!")
+            return false
+        }
+        
+        // check if the app has been used enough times
+        let useCount = userDefaultsObject.integer(forKey: keyForAppRatingKeyString(appratingUseCount))
+        if useCount <= usesUntilPrompt {
+            debugLog("ratingConditionsHaveBeenMet: app has not been used enough times!")
+            return false
+        }
+        
+        // Check if the user previously has declined to rate this version of the app
+        if userHasDeclinedToRate() {
+            debugLog("ratingConditionsHaveBeenMet: user has declined to rate app!")
+            return false
+        }
+        
+        // Check if the user has already rated the app?
+        if userHasRatedCurrentVersion() {
+            debugLog("ratingConditionsHaveBeenMet: user has rated current app!")
+            return false
+        }
+        
+        // If the user wanted to be reminded later, has enough time passed?
+        let timeIntervalOfReminder = userDefaultsObject.double(forKey: keyForAppRatingKeyString(appratingReminderRequestDate))
+        let reminderRequestDate = Date(timeIntervalSince1970: timeIntervalOfReminder)
+        let timeSinceReminderRequest = Date().timeIntervalSince(reminderRequestDate)
+        let timeUntilReminder: TimeInterval = 60 * 60 * 24 * Double(daysBeforeReminding)
+        if timeSinceReminderRequest < timeUntilReminder {
+            debugLog("ratingConditionsHaveBeenMet: user wants to be reminded later, but not enough time passed since last try!")
+            return false
+        }
+        
+        // if we have a global set to not show if the end-user has already rated once, and the developer has not opted out of displaying on minor updates
+        let ratedAnyVersion = userDefaultsObject.bool(forKey: keyForAppRatingKeyString(appratingRatedAnyVersion));
+        if (!shouldPromptIfRated && ratedAnyVersion) {
+            debugLog("ratingConditionsHaveBeenMet: allready voted!")
+            return false
+        }
+        
+        return true
+    }
+    
+    fileprivate func userHasDeclinedToRate() -> Bool {
+        return userDefaultsObject.bool(forKey: keyForAppRatingKeyString(appratingDeclinedToRate));
+    }
+    
+    fileprivate func userHasRatedCurrentVersion() -> Bool {
+        return userDefaultsObject.bool(forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion));
+    }
+    
+    fileprivate func incrementUseCount() {
+        _incrementCountForKeyType(appratingUseCount)
+    }
+    
+    fileprivate func _incrementCountForKeyType(_ keyString: String) {
+       
+        let incrementKey = keyForAppRatingKeyString(keyString);
+        
+        let bundleVersionKey = kCFBundleVersionKey as String
+        // App's version. Not settable as the other ivars because that would be crazy.
+        let currentVersion = Bundle.main.object(forInfoDictionaryKey: bundleVersionKey) as? String
+        if currentVersion == nil {
+            assertionFailure("Could not read kCFBundleVersionKey from InfoDictionary")
+            return
+        }
+        
+        // Get the version number that we've been tracking thus far
+        let currentVersionKey = keyForAppRatingKeyString(appratingRatedCurrentVersion)
+        var trackingVersion: String? = userDefaultsObject.string(forKey: currentVersionKey)
+        // New install, or changed keys
+        if trackingVersion == nil {
+            trackingVersion = currentVersion
+            userDefaultsObject.set(currentVersion as AnyObject?, forKey: currentVersionKey)
+        }
+        
+        debugLog("Tracking version: \(trackingVersion!)")
+        
+        if trackingVersion == currentVersion {
+            // Check if the first use date has been set. if not, set it.
+            let firstUseDateKey = keyForAppRatingKeyString(appratingFirstUseDate)
+            var timeInterval: Double? = userDefaultsObject.double(forKey: firstUseDateKey)
+            if 0 == timeInterval {
+                timeInterval = Date().timeIntervalSince1970
+                userDefaultsObject.set(NSNumber(value: timeInterval!), forKey: firstUseDateKey)
+            }
+            
+            // Increment the key's count
+            var incrementKeyCount = userDefaultsObject.integer(forKey: incrementKey)
+            incrementKeyCount += 1
+            
+            userDefaultsObject.set(incrementKeyCount, forKey:incrementKey)
+            
+            debugLog("Incremented \(incrementKey): \(incrementKeyCount)")
+            
+        } else if tracksNewVersions {
+            // it's a new version of the app, so restart tracking
+            resetAllCounters()
+            debugLog("Reset Tracking Version to: \(trackingVersion!)")
+        }
+        
+        userDefaultsObject.synchronize()
+        if (ratingConditionsHaveBeenMet()) {
+            rateApp();
+        }
+    }
+    
+    public func resetAllCounters() {
+        /*let currentVersionKey = keyForArmchairKeyType(ArmchairKey.CurrentVersion)
+        let trackingVersion: String? = StandardUserDefaults().stringForKey(currentVersionKey)
+        let bundleVersionKey = kCFBundleVersionKey as String
+        let currentVersion = Bundle.main.object(forInfoDictionaryKey: bundleVersionKey) as? String
+        
+        StandardUserDefaults().setObject(trackingVersion as AnyObject?, forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersion))
+        StandardUserDefaults().setObject(StandardUserDefaults().objectForKey(keyForArmchairKeyType(ArmchairKey.RatedCurrentVersion)), forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersionRated))
+        StandardUserDefaults().setObject(StandardUserDefaults().objectForKey(keyForArmchairKeyType(ArmchairKey.DeclinedToRate)), forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersionDeclinedToRate))
+        StandardUserDefaults().setObject(currentVersion as AnyObject?, forKey: currentVersionKey)
+        resetUsageCounters()
+        StandardUserDefaults().setObject(NSNumber(value: false), forKey: keyForArmchairKeyType(ArmchairKey.RatedCurrentVersion))
+        StandardUserDefaults().setObject(NSNumber(value: false), forKey: keyForArmchairKeyType(ArmchairKey.DeclinedToRate))
+        StandardUserDefaults().setObject(NSNumber(value: 0), forKey: keyForArmchairKeyType(ArmchairKey.ReminderRequestDate))
+        StandardUserDefaults().synchronize()*/
+    }
+    
+    // MARK: -
+    // MARK: Notification Handlers
+    
+    @objc public func appWillResignActive(_ notification: Notification) {
+        self.debugLog("appWillResignActive:")
+        hideRatingAlert()
+    }
+    
+    @objc public func applicationDidFinishLaunching(_ notification: Notification) {
+        DispatchQueue.global(qos: .background).async {
+            self.debugLog("applicationDidFinishLaunching:")
+            self.incrementUseCount();
+        }
+    }
+    
+    @objc public func applicationWillEnterForeground(_ notification: Notification) {
+        DispatchQueue.global(qos: .background).async {
+            self.debugLog("applicationWillEnterForeground:")
+            self.incrementUseCount();
+        }
+    }
+    
+    // MARK: -
+    // MARK: PRIVATE Misc Settings
+    
+    // If you aren't going to set an affiliate code yourself, please leave this as is.
+    // It is my affiliate code. It is better that somebody's code is used rather than nobody's.
+    
+    fileprivate var affiliateCode: String                   = "1000ldjv"
+    fileprivate var affiliateCampaignCode: String           = "AppRating"
+    
+    fileprivate func reviewURLString() -> String {
+        let template = reviewURLTemplate
+        var reviewURL = template.replacingOccurrences(of: "APP_ID", with: "\(appID)")
+        reviewURL = reviewURL.replacingOccurrences(of: "AFFILIATE_CODE", with: "\(affiliateCode)")
+        reviewURL = reviewURL.replacingOccurrences(of: "AFFILIATE_CAMPAIGN_CODE", with: "\(affiliateCampaignCode)")
+        debugLog(reviewURL)
+        return reviewURL
+    }
+    
     // MARK: -
     // MARK: PRIVATE Misc Helpers
     
@@ -255,5 +550,88 @@ open class AppRatingManager {
         
         return bundle
     }
+    
+    fileprivate func defaultOpensInStoreKit() -> Bool {
+        switch UIDevice.current.systemVersion.compare("10.3.0", options: NSString.CompareOptions.numeric) {
+        case .orderedSame, .orderedDescending:
+            return true;
+        case .orderedAscending:
+            return false;
+        }
+    }
+    
+    private func topMostViewController(_ controller: UIViewController?) -> UIViewController? {
+        var isPresenting: Bool = false
+        var topController: UIViewController? = controller
+        repeat {
+            // this path is called only on iOS 6+, so -presentedViewController is fine here.
+            if let controller = topController {
+                if let presented = controller.presentedViewController {
+                    isPresenting = true
+                    topController = presented
+                } else {
+                    isPresenting = false
+                }
+            }
+        } while isPresenting
+        
+        return topController
+    }
+    
+    private func getRootViewController() -> UIViewController? {
+        if var window = UIApplication.shared.keyWindow {
+            
+            if window.windowLevel != UIWindowLevelNormal {
+                let windows: NSArray = UIApplication.shared.windows as NSArray
+                for candidateWindow in windows {
+                    if let candidateWindow = candidateWindow as? UIWindow {
+                        if candidateWindow.windowLevel == UIWindowLevelNormal {
+                            window = candidateWindow
+                            break
+                        }
+                    }
+                }
+            }
+            
+            for subView in window.subviews {
+                if let responder = subView.next {
+                    if responder.isKind(of: UIViewController.self) {
+                        return topMostViewController(responder as? UIViewController)
+                    }
+                    
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    // MARK: Tracking Keys with sensible defaults
+    
+    fileprivate lazy var appratingKeyDeclinedToRate: String = "AppRatingKeyDeclinedToRate";
+    fileprivate lazy var appratingReminderRequestDate: String = "AppRatingReminderRequestDate";
+    fileprivate lazy var appratingFirstUseDate: String = "AppRatingFirstUseDate";
+    fileprivate lazy var appratingDeclinedToRate: String = "AppRatingDeclinedToRate";
+    fileprivate lazy var appratingRatedCurrentVersion: String = "AppRatingRatedCurrentVersion";
+    fileprivate lazy var appratingRatedAnyVersion: String = "AppRatingRatedAnyVersion";
+    fileprivate lazy var appratingUseCount: String = "AppRatingUseCount";
+    
+    fileprivate func keyForAppRatingKeyString(_ keyString: String) -> String {
+        return defaultKeyPrefix() + keyString;
+    }
+    
+    // MARK: -
+    // MARK: Debug
+    
+    static let lockQueue = DispatchQueue(label: "com.grizzlynt.lockqueue")
+    
+    fileprivate func debugLog(_ log: String, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
+        if AppRatingManager.debugEnabled {
+            AppRatingManager.lockQueue.sync(execute: {
+                print("[AppRating] \(log)")
+            })
+        }
+    }
+    
 }
 
