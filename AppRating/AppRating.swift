@@ -34,12 +34,12 @@ open class AppRating {
     
     // Getters and Setters
     
-    static func appID(_ appID: String) {
+    open static func appID(_ appID: String) {
         AppRating.appID = appID
         AppRating.manager.appID = appID
     }
     
-    static let manager : AppRatingManager = {
+    open static let manager : AppRatingManager = {
         assert(AppRating.appID != "", "AppRating.appID(appID: String) has to be the first AppRating call made.")
         struct Singleton {
             static let instance: AppRatingManager = AppRatingManager(appID: AppRating.appID)
@@ -47,11 +47,11 @@ open class AppRating {
         return Singleton.instance;
     }()
     
-    static func rate() {
+    open static func rate() {
         AppRating.manager.rateApp();
     }
     
-    static func showRatingAlert() {
+    open static func showRatingAlert() {
         DispatchQueue.main.async {
             AppRating.manager.showRatingAlert()
         }
@@ -63,11 +63,11 @@ open class AppRating {
      * Default => 3
      */
     
-    static func daysUntilPrompt() -> Int {
+    open static func daysUntilPrompt() -> Int {
         return AppRating.manager.daysUntilPrompt
     }
     
-    static func daysUntilPrompt(_ daysUntilPrompt: Int) {
+    open static func daysUntilPrompt(_ daysUntilPrompt: Int) {
         AppRating.manager.daysUntilPrompt = daysUntilPrompt
     }
     
@@ -81,11 +81,11 @@ open class AppRating {
      * Default => 3
      */
     
-    public func usesUntilPrompt() -> Int {
+    open static func usesUntilPrompt() -> Int {
         return AppRating.manager.usesUntilPrompt
     }
     
-    public func usesUntilPrompt(_ usesUntilPrompt: Int) {
+    open static func usesUntilPrompt(_ usesUntilPrompt: Int) {
         AppRating.manager.usesUntilPrompt = usesUntilPrompt
     }
     
@@ -97,11 +97,11 @@ open class AppRating {
      * Default => 1
      */
     
-    public func daysBeforeReminding() -> Int {
+    open static func daysBeforeReminding() -> Int {
         return AppRating.manager.daysBeforeReminding;
     }
     
-    public func daysBeforeReminding(_ daysBeforeReminding: Int) {
+    open static func daysBeforeReminding(_ daysBeforeReminding: Int) {
         AppRating.manager.daysBeforeReminding = daysBeforeReminding
     }
     
@@ -115,11 +115,11 @@ open class AppRating {
      * Default => true
      */
     
-    public func tracksNewVersions() -> Bool {
+    open static func tracksNewVersions() -> Bool {
         return AppRating.manager.tracksNewVersions
     }
     
-    public func tracksNewVersions(_ tracksNewVersions: Bool) {
+    open static func tracksNewVersions(_ tracksNewVersions: Bool) {
         AppRating.manager.tracksNewVersions = tracksNewVersions
     }
     
@@ -130,14 +130,42 @@ open class AppRating {
      * Default => false.
      */
     
-    public func useMainAppBundleForLocalizations() -> Bool {
+    open static func useMainAppBundleForLocalizations() -> Bool {
         return AppRating.manager.useMainAppBundleForLocalizations
     }
     
-    public func useMainAppBundleForLocalizations(_ useMainAppBundleForLocalizations: Bool) {
+    open static func useMainAppBundleForLocalizations(_ useMainAppBundleForLocalizations: Bool) {
         AppRating.manager.useMainAppBundleForLocalizations = useMainAppBundleForLocalizations
     }
+ 
     
+    /*
+     * Enables the debug mode, so a lot of information is printed out to 
+     * the console
+     * Default => false.
+     */
+    
+    open static func debugEnabled() -> Bool {
+        return AppRatingManager.debugEnabled;
+    }
+    
+    open static func debugEnabled(_ newstatus: Bool) {
+        AppRatingManager.debugEnabled = newstatus;
+    }
+    
+    /*
+     * Disables the conditions check when set to true
+     * Useful if you want to test if the correct iTunes Link is opened
+     * Default => false.
+     */
+    
+    open static func ratingConditionsAlwaysTrue() -> Bool {
+        return AppRatingManager.ratingConditionsAlwaysTrue;
+    }
+    
+    open static func ratingConditionsAlwaysTrue(_ newstatus: Bool) {
+        AppRatingManager.ratingConditionsAlwaysTrue = newstatus;
+    }
     
 }
 
