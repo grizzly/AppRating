@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name = "AppRating"
-  spec.version = "0.0.1"
+  spec.version = "0.0.2"
   spec.summary = "A simple yet powerful App Review Manager for iOS in Swift 3"
   spec.description = <<-DESC
     A simple yet powerful App Review Manager for iOS and OSX in Swift.
