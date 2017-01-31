@@ -10,6 +10,7 @@
 		78DA886E1E3F97ED00F6FAB3 /* AppRating.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78DA88641E3F97EC00F6FAB3 /* AppRating.framework */; };
 		78DA88731E3F97ED00F6FAB3 /* AppRatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DA88721E3F97ED00F6FAB3 /* AppRatingTests.swift */; };
 		78DA88751E3F97ED00F6FAB3 /* AppRating.h in Headers */ = {isa = PBXBuildFile; fileRef = 78DA88671E3F97EC00F6FAB3 /* AppRating.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		78FF83B71E40767900C9DAAB /* AppRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78FF83B61E40767900C9DAAB /* AppRating.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +30,7 @@
 		78DA886D1E3F97ED00F6FAB3 /* AppRatingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AppRatingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		78DA88721E3F97ED00F6FAB3 /* AppRatingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRatingTests.swift; sourceTree = "<group>"; };
 		78DA88741E3F97ED00F6FAB3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		78FF83B61E40767900C9DAAB /* AppRating.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppRating.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 			children = (
 				78DA88671E3F97EC00F6FAB3 /* AppRating.h */,
 				78DA88681E3F97EC00F6FAB3 /* Info.plist */,
+				78FF83B61E40767900C9DAAB /* AppRating.swift */,
 			);
 			path = AppRating;
 			sourceTree = "<group>";
@@ -149,6 +152,7 @@
 					78DA88631E3F97EC00F6FAB3 = {
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = 5KR2ADB96A;
+						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					78DA886C1E3F97ED00F6FAB3 = {
@@ -198,6 +202,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78FF83B71E40767900C9DAAB /* AppRating.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,6 +327,7 @@
 		78DA88791E3F97ED00F6FAB3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 5KR2ADB96A;
@@ -335,6 +341,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.grizzlynt.AppRating;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -342,6 +349,7 @@
 		78DA887A1E3F97ED00F6FAB3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 5KR2ADB96A;
@@ -362,6 +370,7 @@
 		78DA887C1E3F97ED00F6FAB3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				DEVELOPMENT_TEAM = 5KR2ADB96A;
 				INFOPLIST_FILE = AppRatingTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -374,6 +383,7 @@
 		78DA887D1E3F97ED00F6FAB3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				DEVELOPMENT_TEAM = 5KR2ADB96A;
 				INFOPLIST_FILE = AppRatingTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
