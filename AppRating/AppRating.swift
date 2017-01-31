@@ -211,6 +211,7 @@ open class AppRatingManager {
     init(appID: String) {
         self.appID = appID;
         setupNotifications();
+        setDefaults();
     }
     
     public func rateApp() {

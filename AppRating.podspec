@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name = "AppRating"
-  spec.version = "0.0.2"
+  spec.version = "1.0.1"
   spec.summary = "A simple yet powerful App Review Manager for iOS in Swift 3"
   spec.description = <<-DESC
     A simple yet powerful App Review Manager for iOS and OSX in Swift.
@@ -17,5 +17,6 @@ Pod::Spec.new do |spec|
   spec.requires_arc = true
   spec.source = { git: "https://github.com/grizzly/AppRating.git", tag: "#{spec.version}", submodules: true }
   spec.source_files = "AppRating/**/*.{h,swift}"
+  spec.ios.resource_bundle = { 'AppRating-iOS' => ['Localization/*.lproj'] }
 
 end
