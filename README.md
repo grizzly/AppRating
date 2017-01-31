@@ -1,3 +1,5 @@
+## AppRating - iOS App Rating for Swift 3
+
 AppRating is a simple yet powerful App Review Manager for iOS and OSX written in Swift. It is based on [Armchair](https://raw.githubusercontent.com/UrbanApps/Armchair/) but mainly rewritten for Swift3.
 
 ## Why AppRating?
