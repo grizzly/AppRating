@@ -178,7 +178,7 @@ open class AppRating {
     
 }
 
-open class AppRatingManager {
+open class AppRatingManager : NSObject {
     
     public var appID : String = "";
     public var appName : String = "";
@@ -209,6 +209,7 @@ open class AppRatingManager {
     
     
     init(appID: String) {
+        super.init();
         self.appID = appID;
         setupNotifications();
         setDefaults();
@@ -585,18 +586,21 @@ open class AppRatingManager {
     
     private func bundle() -> Bundle? {
         var bundle: Bundle? = nil
-        
         if useMainAppBundleForLocalizations {
             bundle = Bundle.main
         } else {
-            let appratingBundleURL: URL? = Bundle.main.url(forResource: "AppRating", withExtension: "bundle")
-            if let url = appratingBundleURL {
-                bundle = Bundle(url: url)
-            } else {
-                bundle = Bundle(for: type(of: self))
+            let podBundle = Bundle(for: self.classForCoder)
+            if let bundleURL = podBundle.url(forResource: "AppRating", withExtension: "bundle") {
+                if let resourceBundle = Bundle(url: bundleURL) {
+                    bundle = resourceBundle;
+                }
             }
         }
-        return bundle
+        if bundle != nil {
+            return bundle;
+        } else {
+            return Bundle.main;
+        }
     }
     
     fileprivate func defaultOpensInStoreKit() -> Bool {
