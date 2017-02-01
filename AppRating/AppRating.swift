@@ -27,7 +27,6 @@ import StoreKit
 import SystemConfiguration
 
 
-
 open class AppRating {
     
     private static var appID : String = "";
@@ -280,11 +279,7 @@ open class AppRatingManager : NSObject {
     // MARK: PRIVATE Functions
     
     fileprivate func rateApp() {
-        
-        userDefaultsObject.set(true, forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion));
-        userDefaultsObject.set(true, forKey: keyForAppRatingKeyString(appratingRatedAnyVersion));
-        userDefaultsObject.synchronize()
-        
+        self.setUserHasRatedApp();
         if (defaultOpensInStoreKit()) {
             UIApplication.shared.openURL(URL(string: reviewURLString())!)
         } else {
@@ -296,7 +291,8 @@ open class AppRatingManager : NSObject {
         
         if (useSKStorereViewController && self.defaultOpensInSKStoreReviewController()) {
             if #available(iOS 10.3, *) {
-                //SKStoreReviewController.requestReview()
+                SKStoreReviewController.requestReview();
+                self.setUserHasRatedApp();
             }
         } else {
             
@@ -331,6 +327,12 @@ open class AppRatingManager : NSObject {
             self.ratingAlert = alertView;
         }
         
+    }
+    
+    fileprivate func setUserHasRatedApp() {
+        userDefaultsObject.set(true, forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion));
+        userDefaultsObject.set(true, forKey: keyForAppRatingKeyString(appratingRatedAnyVersion));
+        userDefaultsObject.synchronize()
     }
     
     private func hideRatingAlert() {
@@ -671,7 +673,8 @@ open class AppRatingManager : NSObject {
     
     
     fileprivate func defaultOpensInSKStoreReviewController() -> Bool {
-        switch UIDevice.current.systemVersion.compare("10.3.0", options: NSString.CompareOptions.numeric) {
+        let version = UIDevice.current.systemVersion.compare("10.3", options: NSString.CompareOptions.numeric);
+        switch version {
         case .orderedSame, .orderedDescending:
             return true;
         case .orderedAscending:
