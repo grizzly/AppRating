@@ -2,6 +2,12 @@
 
 AppRating is a simple yet powerful App Review Manager for iOS and OSX written in Swift. It is based on [Armchair](https://raw.githubusercontent.com/UrbanApps/Armchair/) but mainly rewritten for Swift3.
 
+## What's new?
+
+- SKStoreReviewController - Now supporting the brand new iOS 10.3 API SKStoreReviewController which makes it really easy to get a huge number of ratings for your app.
+
+![AppRating supports the brand new SKStoreReviewController API](https://pbs.twimg.com/media/C3BFBGMWEAAL5Di.png)
+
 ## Why AppRating?
 
 The average end-user will only write a review if something is wrong with your App. This leads to an unfairly negative skew in the ratings, when the majority of satisfied customers don’t leave reviews and only the dissatisfied ones do. In order to counter-balance the negatives, AppRating prompts the user to write a review, but only after the developer knows they are satisfied. For example, you may only show the popup if the user has been using it for more than a week, and has done at least 5 significant events (the core functionality of your App). The rules are fully customizable for your App and easy to setup.

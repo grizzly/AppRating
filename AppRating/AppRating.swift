@@ -146,11 +146,11 @@ open class AppRating {
      */
     
     open static func debugEnabled() -> Bool {
-        return AppRatingManager.debugEnabled;
+        return self.manager.debugEnabled;
     }
     
     open static func debugEnabled(_ newstatus: Bool) {
-        AppRatingManager.debugEnabled = newstatus;
+        self.manager.debugEnabled = newstatus;
     }
     
     /*
@@ -160,11 +160,11 @@ open class AppRating {
      */
     
     open static func ratingConditionsAlwaysTrue() -> Bool {
-        return AppRatingManager.ratingConditionsAlwaysTrue;
+        return self.manager.ratingConditionsAlwaysTrue;
     }
     
     open static func ratingConditionsAlwaysTrue(_ newstatus: Bool) {
-        AppRatingManager.ratingConditionsAlwaysTrue = newstatus;
+        self.manager.ratingConditionsAlwaysTrue = newstatus;
     }
     
     /*
@@ -173,6 +173,22 @@ open class AppRating {
     
     open static func resetAllCounters() {
         return self.manager.resetAllCounters();
+    }
+    
+    /*
+     * Availabe for iOS 10.3+ 
+     * Will use the new Apple App Rating Feature if 
+     * set to true. Apple decides wheter it is the right
+     * time to present the review screen, so it may not be
+     * displayed also when the conditions will be met.
+     */
+    
+    open static func useSKStorereViewController() -> Bool {
+        return self.manager.useSKStorereViewController;
+    }
+    
+    open static func useSKStorereViewController(_ newstatus: Bool) {
+        self.manager.useSKStorereViewController = newstatus;
     }
 
     
@@ -190,9 +206,10 @@ open class AppRatingManager : NSObject {
     public var useMainAppBundleForLocalizations : Bool = false;
     public var usesAnimation : Bool = true;
     public var tintColor : UIColor?;
-    
-    static var debugEnabled : Bool = false;
-    static var ratingConditionsAlwaysTrue: Bool = false;
+    public var useSKStorereViewController : Bool = false;
+    public var ratingConditionsAlwaysTrue: Bool = false;
+    public var debugEnabled : Bool = false;
+
     
     fileprivate var userDefaultsObject = UserDefaults.standard;
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
@@ -241,35 +258,42 @@ open class AppRatingManager : NSObject {
     
     fileprivate func showRatingAlert() {
         
-        let alertView : UIAlertController = UIAlertController(title: defaultReviewTitle(), message: defaultReviewMessage(), preferredStyle: UIAlertControllerStyle.alert)
-        alertView.addAction(UIAlertAction(title: defaultCancelButtonTitle(), style:UIAlertActionStyle.cancel, handler: {
-            (alert: UIAlertAction!) in
-            self.dontRate()
-        }))
-        if (showsRemindButton()) {
-            if let defaultremindtitle = defaultRemindButtonTitle() {
-                alertView.addAction(UIAlertAction(title: defaultremindtitle, style:UIAlertActionStyle.default, handler: {
-                    (alert: UIAlertAction!) in
-                    self.remindMeLater()
-                }))
+        if (useSKStorereViewController && self.defaultOpensInSKStoreReviewController()) {
+            if #available(iOS 10.3, *) {
+                //SKStoreReviewController.requestReview()
             }
-        }
-        alertView.addAction(UIAlertAction(title: defaultRateButtonTitle(), style:UIAlertActionStyle.default, handler: {
-            (alert: UIAlertAction!) in
-            self._rateApp()
-        }))
-        
-        // get the top most controller (= the StoreKit Controller) and dismiss it
-        if let presentingController = UIApplication.shared.keyWindow?.rootViewController {
-            if let topController = topMostViewController(presentingController) {
-                topController.present(alertView, animated: usesAnimation) {
-                    self.debugLog("presentViewController() completed")
+        } else {
+            
+            let alertView : UIAlertController = UIAlertController(title: defaultReviewTitle(), message: defaultReviewMessage(), preferredStyle: UIAlertControllerStyle.alert)
+            alertView.addAction(UIAlertAction(title: defaultCancelButtonTitle(), style:UIAlertActionStyle.cancel, handler: {
+                (alert: UIAlertAction!) in
+                self.dontRate()
+            }))
+            if (showsRemindButton()) {
+                if let defaultremindtitle = defaultRemindButtonTitle() {
+                    alertView.addAction(UIAlertAction(title: defaultremindtitle, style:UIAlertActionStyle.default, handler: {
+                        (alert: UIAlertAction!) in
+                        self.remindMeLater()
+                    }))
                 }
             }
-            // note that tint color has to be set after the controller is presented in order to take effect (last checked in iOS 9.3)
-            alertView.view.tintColor = tintColor
+            alertView.addAction(UIAlertAction(title: defaultRateButtonTitle(), style:UIAlertActionStyle.default, handler: {
+                (alert: UIAlertAction!) in
+                self._rateApp()
+            }))
+            
+            // get the top most controller (= the StoreKit Controller) and dismiss it
+            if let presentingController = UIApplication.shared.keyWindow?.rootViewController {
+                if let topController = topMostViewController(presentingController) {
+                    topController.present(alertView, animated: usesAnimation) {
+                        self.debugLog("presentViewController() completed")
+                    }
+                }
+                // note that tint color has to be set after the controller is presented in order to take effect (last checked in iOS 9.3)
+                alertView.view.tintColor = tintColor
+            }
+            self.ratingAlert = alertView;
         }
-        self.ratingAlert = alertView;
         
     }
     
@@ -393,11 +417,11 @@ open class AppRatingManager : NSObject {
     
     fileprivate func ratingConditionsHaveBeenMet() -> Bool {
         
-        if AppRatingManager.ratingConditionsAlwaysTrue {
+        if self.ratingConditionsAlwaysTrue {
             return true
         }
         
-        if appID.isEmpty {
+        if self.appID.isEmpty {
             debugLog("ratingConditionsHaveBeenMet: appID empty!")
             return false
         }
@@ -603,6 +627,16 @@ open class AppRatingManager : NSObject {
         }
     }
     
+    
+    fileprivate func defaultOpensInSKStoreReviewController() -> Bool {
+        switch UIDevice.current.systemVersion.compare("10.3.0", options: NSString.CompareOptions.numeric) {
+        case .orderedSame, .orderedDescending:
+            return true;
+        case .orderedAscending:
+            return false;
+        }
+    }
+    
     fileprivate func defaultOpensInStoreKit() -> Bool {
         switch UIDevice.current.systemVersion.compare("10.3.0", options: NSString.CompareOptions.numeric) {
         case .orderedSame, .orderedDescending:
@@ -678,10 +712,10 @@ open class AppRatingManager : NSObject {
     // MARK: -
     // MARK: Debug
     
-    static let lockQueue = DispatchQueue(label: "com.grizzlynt.lockqueue")
+    static let lockQueue = DispatchQueue(label: "com.grizzlynt.apprating.lockqueue")
     
     fileprivate func debugLog(_ log: String, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
-        if AppRatingManager.debugEnabled {
+        if self.debugEnabled {
             AppRatingManager.lockQueue.sync(execute: {
                 print("[AppRating] \(log)")
             })

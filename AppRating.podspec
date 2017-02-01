@@ -18,4 +18,5 @@ Pod::Spec.new do |spec|
   spec.source = { git: "https://github.com/grizzly/AppRating.git", tag: "#{spec.version}", submodules: true }
   spec.source_files = "AppRating/**/*.{h,swift}"
   spec.ios.resource_bundle = { 'AppRating' => ['Localization/*.lproj'] }
+  spec.preserve_paths
 end
