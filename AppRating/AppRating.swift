@@ -31,8 +31,22 @@ import SystemConfiguration
 open class AppRating {
     
     private static var appID : String = "";
+
+    // MARK: -
+    // MARK: Public Functions
     
-    // Getters and Setters
+    open static func rate() {
+        AppRating.manager.rateApp();
+    }
+    
+    open static func showRatingAlert() {
+        DispatchQueue.main.async {
+            AppRating.manager.showRatingAlert()
+        }
+    }
+    
+    // MARK: -
+    // MARK: Getters & Setters
     
     open static func appID(_ appID: String) {
         AppRating.appID = appID
@@ -47,15 +61,6 @@ open class AppRating {
         return Singleton.instance;
     }()
     
-    open static func rate() {
-        AppRating.manager.rateApp();
-    }
-    
-    open static func showRatingAlert() {
-        DispatchQueue.main.async {
-            AppRating.manager.showRatingAlert()
-        }
-    }
     
     /*
      * Users will need to have the same version of your app installed for this many
@@ -91,7 +96,7 @@ open class AppRating {
     
     /*
      * Once the rating alert is presented to the user, they might select
-     * 'Remind me later'. This value specifies how many days Armchair
+     * 'Remind me later'. This value specifies how many days AppRating
      * will wait before reminding them. A value of 0 disables reminders and
      * removes the 'Remind me later' button.
      * Default => 1
@@ -106,11 +111,31 @@ open class AppRating {
     }
     
     /*
-     * By default, Armchair tracks all new bundle versions.
+     * A significant event can be anything you want to be in your app. In a
+     * telephone app, a significant event might be placing or receiving a call.
+     * In a game, it might be beating a level or a boss. This is just another
+     * layer of filtering that can be used to make sure that only the most
+     * loyal of your users are being prompted to rate you on the app store.
+     * If you leave this at a value of 0 (default), then this won't be a criterion
+     * used for rating.
+     *
+     * To tell AppRating that the user has performed
+     * a significant event, call the method AppRating.userDidSignificantEvent()
+     * Default => 0
+     */
+    open static func significantEventsUntilPrompt() -> Int {
+        return AppRating.manager.significantEventsUntilPrompt
+    }
+    open static func significantEventsUntilPrompt(significantEventsUntilPrompt: Int) {
+        AppRating.manager.significantEventsUntilPrompt = significantEventsUntilPrompt
+    }
+    
+    /*
+     * By default, AppRating tracks all new bundle versions.
      * When it detects a new version, it resets the values saved for usage,
      * significant events, popup shown, user action etc...
-     * By setting this to false, Armchair will ONLY track the version it
-     * was initialized with. If this setting is set to true, Armchair
+     * By setting this to false, AppRating will ONLY track the version it
+     * was initialized with. If this setting is set to true, AppRating
      * will reset after each new version detection.
      * Default => true
      */
@@ -126,7 +151,7 @@ open class AppRating {
     /*
      * If set to true, the main bundle will always be used to load localized strings.
      * Set this to true if you have provided your own custom localizations in
-     * ArmchairLocalizable.strings in your main bundle
+     * AppRatingLocalizable.strings in your main bundle
      * Default => false.
      */
     
@@ -181,6 +206,7 @@ open class AppRating {
      * set to true. Apple decides wheter it is the right
      * time to present the review screen, so it may not be
      * displayed also when the conditions will be met.
+     * Default => true (for iOS 10.3+)
      */
     
     open static func useSKStorereViewController() -> Bool {
@@ -196,17 +222,21 @@ open class AppRating {
 
 open class AppRatingManager : NSObject {
     
+    // MARK: -
+    // MARK: Public Members
+    
     public var appID : String = "";
     public var appName : String = "";
     public var daysUntilPrompt : Int = 3;
     public var usesUntilPrompt : Int = 3;
     public var daysBeforeReminding : Int = 1;
+    public var significantEventsUntilPrompt : Int = 0;
     public var tracksNewVersions : Bool = true;
     public var shouldPromptIfRated : Bool = true;
     public var useMainAppBundleForLocalizations : Bool = false;
     public var usesAnimation : Bool = true;
     public var tintColor : UIColor?;
-    public var useSKStorereViewController : Bool = false;
+    public var useSKStorereViewController : Bool = true;
     public var ratingConditionsAlwaysTrue: Bool = false;
     public var debugEnabled : Bool = false;
 
@@ -217,13 +247,18 @@ open class AppRatingManager : NSObject {
     fileprivate var ratingAlert: UIAlertController? = nil
     fileprivate let reviewURLTemplate  = "https://itunes.apple.com/us/app/x/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
     
+    // MARK: -
     // MARK: Optional Closures
+    
     public typealias AppRatingClosure = () -> ()
     var didDisplayAlertClosure: AppRatingClosure?
     var didDeclineToRateClosure: AppRatingClosure?
     var didOptToRateClosure: AppRatingClosure?
     var didOptToRemindLaterClosure: AppRatingClosure?
+
     
+    // MARK: -
+    // MARK: Initialization
     
     init(appID: String) {
         super.init();
@@ -232,7 +267,19 @@ open class AppRatingManager : NSObject {
         setDefaults();
     }
     
-    public func rateApp() {
+    // MARK: -
+    // MARK: Singleton Instance Setup
+    
+    fileprivate func setupNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.appWillResignActive(_:)),            name: NSNotification.Name.UIApplicationWillResignActive,    object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationDidFinishLaunching(_:)),  name: NSNotification.Name.UIApplicationDidFinishLaunching,  object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationWillEnterForeground(_:)), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
+    }
+    
+    // MARK: -
+    // MARK: PRIVATE Functions
+    
+    fileprivate func rateApp() {
         
         userDefaultsObject.set(true, forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion));
         userDefaultsObject.set(true, forKey: keyForAppRatingKeyString(appratingRatedAnyVersion));
@@ -244,17 +291,6 @@ open class AppRatingManager : NSObject {
             UIApplication.shared.openURL(URL(string: reviewURLString())!)
         }
     }
-    
-    // MARK: Singleton Instance Setup
-    
-    fileprivate func setupNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.appWillResignActive(_:)),            name: NSNotification.Name.UIApplicationWillResignActive,    object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationDidFinishLaunching(_:)),  name: NSNotification.Name.UIApplicationDidFinishLaunching,  object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationWillEnterForeground(_:)), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
-    }
-    
-    // MARK: -
-    // MARK: PRIVATE Functions
     
     fileprivate func showRatingAlert() {
         
@@ -440,6 +476,12 @@ open class AppRatingManager : NSObject {
         let useCount = userDefaultsObject.integer(forKey: keyForAppRatingKeyString(appratingUseCount))
         if useCount <= usesUntilPrompt {
             debugLog("ratingConditionsHaveBeenMet: app has not been used enough times!")
+            return false
+        }
+        
+        // check if the user has done enough significant events
+        let significantEventCount = userDefaultsObject.integer(forKey: keyForAppRatingKeyString(appratingSignificantEventCount))
+        if significantEventCount < significantEventsUntilPrompt {
             return false
         }
         
@@ -704,6 +746,7 @@ open class AppRatingManager : NSObject {
     fileprivate lazy var appratingFirstUseDate: String = "AppRatingFirstUseDate";
     fileprivate lazy var appratingRatedAnyVersion: String = "AppRatingRatedAnyVersion";
     fileprivate lazy var appratingUseCount: String = "AppRatingUseCount";
+    fileprivate lazy var appratingSignificantEventCount : String = "AppRatingSignificantEventCount";
     
     fileprivate func keyForAppRatingKeyString(_ keyString: String) -> String {
         return defaultKeyPrefix() + keyString;
