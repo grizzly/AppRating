@@ -289,9 +289,9 @@ open class AppRatingManager : NSObject {
     
     fileprivate func showRatingAlert() {
         
-        if (useSKStorereViewController && self.defaultOpensInSKStoreReviewController()) {
+        if (false && useSKStorereViewController && self.defaultOpensInSKStoreReviewController()) {
             if #available(iOS 10.3, *) {
-                SKStoreReviewController.requestReview();
+                //SKStoreReviewController.requestReview();
                 self.setUserHasRatedApp();
             }
         } else {
