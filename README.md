@@ -14,7 +14,7 @@ The average end-user will only write a review if something is wrong with your Ap
 
 ## Requirements
 
-- Xcode 6.1+
+- Xcode 8.3+ (get the beta version at [Apple Developer](https://developer.apple.com/))
 - iOS 9.0+
 
 ## Installation

@@ -1,10 +1,11 @@
 Pod::Spec.new do |spec|
   spec.name = "AppRating"
-  spec.version = "1.1.0"
+  spec.version = "1.2.0"
   spec.summary = "A simple yet powerful App Review Manager for iOS in Swift 3. Now supporting SKStoreReviewController API."
   spec.description = <<-DESC
     A simple yet powerful App Review Manager for iOS and OSX in Swift.
     * 100% Swift 3
+    * First and only App Rating Library that supports SKStoreReviewController
     * Fully Configurable at Runtime
     * Default Localizations for Dozens of Languages
     * Easy to Setup
