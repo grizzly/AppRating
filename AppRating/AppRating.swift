@@ -589,7 +589,7 @@ open class AppRatingManager : NSObject {
         if useMainAppBundleForLocalizations {
             bundle = Bundle.main
         } else {
-            let podBundle = Bundle(for: self.classForCoder)
+            let podBundle = Bundle(for: AppRatingManager.classForCoder())
             if let bundleURL = podBundle.url(forResource: "AppRating", withExtension: "bundle") {
                 if let resourceBundle = Bundle(url: bundleURL) {
                     bundle = resourceBundle;
