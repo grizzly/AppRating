@@ -4,7 +4,7 @@ AppRating is a simple yet powerful App Review Manager for iOS and OSX written in
 
 ## What's new?
 
-- SKStoreReviewController - Now supporting the brand new iOS 10.3 API SKStoreReviewController which makes it really easy to get a huge number of ratings for your app.
+- SKStoreReviewController - Now supporting the brand new iOS 10.3 API SKStoreReviewController which makes it really easy to get a huge number of ratings for your app. It opens the rating directly in an alert:
 
 ![AppRating supports the brand new SKStoreReviewController API](https://pbs.twimg.com/media/C3BFBGMWEAAL5Di.png)
 
