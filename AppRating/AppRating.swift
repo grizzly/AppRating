@@ -314,7 +314,7 @@ open class AppRatingManager : NSObject {
     
     fileprivate var userDefaultsObject = UserDefaults.standard;
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
-    fileprivate var currentVersion = Bundle.main.object(forInfoDictionaryKey: kCFBundleVersionKey as String) as? String
+    fileprivate var currentVersion = "0.0.0";
     fileprivate var ratingAlert: UIAlertController? = nil
     fileprivate let reviewURLTemplate  = "https://itunes.apple.com/us/app/x/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
     
@@ -443,6 +443,7 @@ open class AppRatingManager : NSObject {
     
     fileprivate func setDefaults() {
         self.appName = self.defaultAppName();
+        self.currentVersion = getAppVersion();
     }
     
     fileprivate func defaultKeyPrefix() -> String {
@@ -450,6 +451,14 @@ open class AppRatingManager : NSObject {
             return self.appID + "_"
         } else {
             return "_"
+        }
+    }
+    
+    fileprivate func getAppVersion() -> String {
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            return version;
+        } else {
+            return "0.0.0";
         }
     }
     
@@ -620,13 +629,8 @@ open class AppRatingManager : NSObject {
        
         let incrementKey = keyForAppRatingKeyString(keyString);
         
-        let bundleVersionKey = kCFBundleVersionKey as String
         // App's version. Not settable as the other ivars because that would be crazy.
-        let currentVersion = Bundle.main.object(forInfoDictionaryKey: bundleVersionKey) as? String
-        if currentVersion == nil {
-            assertionFailure("Could not read kCFBundleVersionKey from InfoDictionary")
-            return
-        }
+        let currentVersion = getAppVersion();
         
         // Get the version number that we've been tracking thus far
         let currentVersionKey = keyForAppRatingKeyString(appratingCurrentVersion)
@@ -637,6 +641,7 @@ open class AppRatingManager : NSObject {
             userDefaultsObject.set(currentVersion as AnyObject?, forKey: currentVersionKey)
         }
         
+        debugLog("Current version : \(currentVersion)")
         debugLog("Tracking version: \(trackingVersion!)")
         
         if trackingVersion == currentVersion {
@@ -659,7 +664,7 @@ open class AppRatingManager : NSObject {
         } else if tracksNewVersions {
             // it's a new version of the app, so restart tracking
             resetAllCounters()
-            debugLog("Reset Tracking Version to: \(trackingVersion!)")
+            debugLog("Reset Tracking Version to: \(currentVersion)")
         }
         
         userDefaultsObject.synchronize()
@@ -674,8 +679,7 @@ open class AppRatingManager : NSObject {
         
         let currentVersionKey = keyForAppRatingKeyString(appratingCurrentVersion);
         let trackingVersion: String? = userDefaultsObject.string(forKey: currentVersionKey)
-        let bundleVersionKey = kCFBundleVersionKey as String
-        let currentVersion = Bundle.main.object(forInfoDictionaryKey: bundleVersionKey) as? String
+        let currentVersion = getAppVersion();
         
         userDefaultsObject.set(trackingVersion as AnyObject?, forKey: keyForAppRatingKeyString(appratingPreviousVersion))
         userDefaultsObject.set(userDefaultsObject.object(forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion)), forKey: keyForAppRatingKeyString(appratingRatedPreviousVersion))
