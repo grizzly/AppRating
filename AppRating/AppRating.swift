@@ -256,8 +256,8 @@ open class AppRating {
      * Default => true (for iOS 10.3+)
      */
     
-    open static func useSKStoreViewController() -> Bool {
-        return self.manager.useSKStorereViewController;
+    open static func useSKStoreReviewController() -> Bool {
+        return self.manager.useSKStoreReviewController;
     }
     
     /**
@@ -266,8 +266,8 @@ open class AppRating {
      * - Parameter newstatus: the value
      */
     
-    open static func useSKStoreViewController(_ newstatus: Bool) {
-        self.manager.useSKStorereViewController = newstatus;
+    open static func useSKStoreReviewController(_ newstatus: Bool) {
+        self.manager.useSKStoreReviewController = newstatus;
     }
     
     // MARK: Events
@@ -307,7 +307,7 @@ open class AppRatingManager : NSObject {
     public var useMainAppBundleForLocalizations : Bool = false;
     public var usesAnimation : Bool = true;
     public var tintColor : UIColor?;
-    public var useSKStorereViewController : Bool = true;
+    public var useSKStoreReviewController : Bool = true;
     public var ratingConditionsAlwaysTrue: Bool = false;
     public var debugEnabled : Bool = false;
 
@@ -361,7 +361,7 @@ open class AppRatingManager : NSObject {
     
     fileprivate func showRatingAlert() {
         
-        if (false && useSKStorereViewController && self.defaultOpensInSKStoreReviewController()) {
+        if (false && useSKStoreReviewController && self.defaultOpensInSKStoreReviewController()) {
             if #available(iOS 10.3, *) {
                 //SKStoreReviewController.requestReview();
                 self.setUserHasRatedApp();
