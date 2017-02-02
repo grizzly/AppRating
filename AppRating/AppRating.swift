@@ -30,14 +30,23 @@ import SystemConfiguration
 open class AppRating {
     
     private static var appID : String = "";
-
+    
     // MARK: -
     // MARK: Public Functions
     
+    /**
+     * Explicit call to start the rating process.
+     * Should only be called directly on a user interaction like
+     * pressing a "Please rate this app" button
+     */
     open static func rate() {
         AppRating.manager.rateApp();
     }
     
+    /**
+     * Explicit call to show the AlertView, asking
+     * the user if she/he wants to rate the app.
+     */
     open static func showRatingAlert() {
         DispatchQueue.main.async {
             AppRating.manager.showRatingAlert()
@@ -47,11 +56,21 @@ open class AppRating {
     // MARK: -
     // MARK: Getters & Setters
     
+    /**
+     * Used to set the Apple App Store AppID.
+     * Has to be set as the very first call to AppRating
+     *
+     * - Parameter appID: Apple App ID
+     */
     open static func appID(_ appID: String) {
         AppRating.appID = appID
         AppRating.manager.appID = appID
     }
     
+    
+    /**
+     * Singleton instance of the underlaying rating manager.
+     */
     open static let manager : AppRatingManager = {
         assert(AppRating.appID != "", "AppRating.appID(appID: String) has to be the first AppRating call made.")
         struct Singleton {
@@ -61,21 +80,29 @@ open class AppRating {
     }()
     
     
-    /*
+    /**
      * Users will need to have the same version of your app installed for this many
      * days before they will be prompted to rate it.
      * Default => 3
      */
-    
     open static func daysUntilPrompt() -> Int {
         return AppRating.manager.daysUntilPrompt
     }
     
+    /**
+     * Used to set the number of days before the app should
+     * ask the user for a rating. If you ask people after some
+     * days only, the chance for getting better ratings is higher.
+     * People who don't like your app will delete it mostly within
+     * 1 day.
+     *
+     * - Parameter daysUntilPrompt: Number of days until Prompt
+     */
     open static func daysUntilPrompt(_ daysUntilPrompt: Int) {
         AppRating.manager.daysUntilPrompt = daysUntilPrompt
     }
     
-    /*
+    /**
      * An example of a 'use' would be if the user launched the app. Bringing the app
      * into the foreground (on devices that support it) would also be considered
      * a 'use'.
@@ -89,11 +116,18 @@ open class AppRating {
         return AppRating.manager.usesUntilPrompt
     }
     
+    
+    /**
+     * Sets the number of uses needed before the app asks the user
+     * to rate the app
+     *
+     * - Parameter usesUntilPrompt: Number of days until Prompt
+     */
     open static func usesUntilPrompt(_ usesUntilPrompt: Int) {
         AppRating.manager.usesUntilPrompt = usesUntilPrompt
     }
     
-    /*
+    /**
      * Once the rating alert is presented to the user, they might select
      * 'Remind me later'. This value specifies how many days AppRating
      * will wait before reminding them. A value of 0 disables reminders and
@@ -105,11 +139,18 @@ open class AppRating {
         return AppRating.manager.daysBeforeReminding;
     }
     
+    /**
+     * Sets the number of days needed before the app asks the user
+     * to rate the app again (after the user has pressed 'remind me
+     * later'
+     *
+     * - Parameter daysBeforeReminding: Number of days before asking again
+     */
     open static func daysBeforeReminding(_ daysBeforeReminding: Int) {
         AppRating.manager.daysBeforeReminding = daysBeforeReminding
     }
     
-    /*
+    /**
      * A significant event can be anything you want to be in your app. In a
      * telephone app, a significant event might be placing or receiving a call.
      * In a game, it might be beating a level or a boss. This is just another
@@ -125,11 +166,18 @@ open class AppRating {
     open static func significantEventsUntilPrompt() -> Int {
         return AppRating.manager.significantEventsUntilPrompt
     }
-    open static func significantEventsUntilPrompt(significantEventsUntilPrompt: Int) {
+    
+    /**
+     * Sets the number of significant events needed before the app asks the user
+     * to rate the app
+     *
+     * - Parameter significantEventsUntilPrompt: Number of significant events needed
+     */
+    open static func significantEventsUntilPrompt(_ significantEventsUntilPrompt: Int) {
         AppRating.manager.significantEventsUntilPrompt = significantEventsUntilPrompt
     }
     
-    /*
+    /**
      * By default, AppRating tracks all new bundle versions.
      * When it detects a new version, it resets the values saved for usage,
      * significant events, popup shown, user action etc...
@@ -147,7 +195,7 @@ open class AppRating {
         AppRating.manager.tracksNewVersions = tracksNewVersions
     }
     
-    /*
+    /**
      * If set to true, the main bundle will always be used to load localized strings.
      * Set this to true if you have provided your own custom localizations in
      * AppRatingLocalizable.strings in your main bundle
@@ -161,10 +209,10 @@ open class AppRating {
     open static func useMainAppBundleForLocalizations(_ useMainAppBundleForLocalizations: Bool) {
         AppRating.manager.useMainAppBundleForLocalizations = useMainAppBundleForLocalizations
     }
- 
     
-    /*
-     * Enables the debug mode, so a lot of information is printed out to 
+    
+    /**
+     * Enables the debug mode, so a lot of information is printed out to
      * the console
      * Default => false.
      */
@@ -177,7 +225,7 @@ open class AppRating {
         self.manager.debugEnabled = newstatus;
     }
     
-    /*
+    /**
      * Disables the conditions check when set to true
      * Useful if you want to test if the correct iTunes Link is opened
      * Default => false.
@@ -191,7 +239,7 @@ open class AppRating {
         self.manager.ratingConditionsAlwaysTrue = newstatus;
     }
     
-    /*
+    /**
      * Resets all counters. Perfect for testing.
      */
     
@@ -199,23 +247,47 @@ open class AppRating {
         return self.manager.resetAllCounters();
     }
     
-    /*
-     * Availabe for iOS 10.3+ 
-     * Will use the new Apple App Rating Feature if 
+    /**
+     * Availabe for iOS 10.3+
+     * Will use the new Apple App Rating Feature if
      * set to true. Apple decides wheter it is the right
      * time to present the review screen, so it may not be
      * displayed also when the conditions will be met.
      * Default => true (for iOS 10.3+)
      */
     
-    open static func useSKStorereViewController() -> Bool {
-        return self.manager.useSKStorereViewController;
+    open static func useSKStoreReviewController() -> Bool {
+        return self.manager.useSKStoreReviewController;
     }
     
-    open static func useSKStorereViewController(_ newstatus: Bool) {
-        self.manager.useSKStorereViewController = newstatus;
+    /**
+     * If you don't want to user SKStoreViewController at all
+     * simply set this to false
+     * - Parameter newstatus: the value
+     */
+    
+    open static func useSKStoreReviewController(_ newstatus: Bool) {
+        self.manager.useSKStoreReviewController = newstatus;
     }
-
+    
+    // MARK: Events
+    
+    /**
+     * Tells AppRating that the user performed a significant event.
+     * A significant event is whatever you want it to be. If you're app is used
+     * to make VoIP calls, then you might want to call this method whenever the
+     * user places a call. If it's a game, you might want to call this whenever
+     * the user beats a level boss.
+     *
+     * If the user has performed enough significant events and used the app enough,
+     * you can suppress the rating alert by passing false for canPromptForRating. The
+     * rating alert will simply be postponed until it is called again with true for
+     * canPromptForRating.
+     */
+    open static func userDidSignificantEvent(canPromptForRating: Bool) {
+        self.manager.userDidSignificantEvent(canPromptForRating: canPromptForRating)
+    }
+    
     
 }
 
@@ -235,14 +307,14 @@ open class AppRatingManager : NSObject {
     public var useMainAppBundleForLocalizations : Bool = false;
     public var usesAnimation : Bool = true;
     public var tintColor : UIColor?;
-    public var useSKStorereViewController : Bool = true;
+    public var useSKStoreReviewController : Bool = true;
     public var ratingConditionsAlwaysTrue: Bool = false;
     public var debugEnabled : Bool = false;
-
+    
     
     fileprivate var userDefaultsObject = UserDefaults.standard;
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
-    fileprivate var currentVersion = Bundle.main.object(forInfoDictionaryKey: kCFBundleVersionKey as String) as? String
+    fileprivate var currentVersion = "0.0.0";
     fileprivate var ratingAlert: UIAlertController? = nil
     fileprivate let reviewURLTemplate  = "https://itunes.apple.com/us/app/x/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
     
@@ -254,7 +326,7 @@ open class AppRatingManager : NSObject {
     var didDeclineToRateClosure: AppRatingClosure?
     var didOptToRateClosure: AppRatingClosure?
     var didOptToRemindLaterClosure: AppRatingClosure?
-
+    
     
     // MARK: -
     // MARK: Initialization
@@ -289,7 +361,7 @@ open class AppRatingManager : NSObject {
     
     fileprivate func showRatingAlert() {
         
-        if (useSKStorereViewController && self.defaultOpensInSKStoreReviewController()) {
+        if (useSKStoreReviewController && self.defaultOpensInSKStoreReviewController()) {
             if #available(iOS 10.3, *) {
                 SKStoreReviewController.requestReview();
                 self.setUserHasRatedApp();
@@ -371,6 +443,7 @@ open class AppRatingManager : NSObject {
     
     fileprivate func setDefaults() {
         self.appName = self.defaultAppName();
+        self.currentVersion = getAppVersion();
     }
     
     fileprivate func defaultKeyPrefix() -> String {
@@ -378,6 +451,14 @@ open class AppRatingManager : NSObject {
             return self.appID + "_"
         } else {
             return "_"
+        }
+    }
+    
+    fileprivate func getAppVersion() -> String {
+        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            return version;
+        } else {
+            return "0.0.0";
         }
     }
     
@@ -484,6 +565,7 @@ open class AppRatingManager : NSObject {
         // check if the user has done enough significant events
         let significantEventCount = userDefaultsObject.integer(forKey: keyForAppRatingKeyString(appratingSignificantEventCount))
         if significantEventCount < significantEventsUntilPrompt {
+            self.debugLog("ratingConditionsHaveBeenMet: not enough sigificant events!")
             return false
         }
         
@@ -527,21 +609,26 @@ open class AppRatingManager : NSObject {
         return userDefaultsObject.bool(forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion));
     }
     
-    fileprivate func incrementUseCount() {
-        _incrementCountForKeyType(appratingUseCount)
+    fileprivate func userDidSignificantEvent(canPromptForRating: Bool) {
+        DispatchQueue.global(qos: .background).async {
+            self.incrementSignificantEventCount(canPromptForRating: canPromptForRating)
+        }
     }
     
-    fileprivate func _incrementCountForKeyType(_ keyString: String) {
-       
+    fileprivate func incrementSignificantEventCount(canPromptForRating: Bool) {
+        _incrementCountForKeyType(appratingSignificantEventCount, canPromptForRating: canPromptForRating);
+    }
+    
+    fileprivate func incrementUseCount() {
+        _incrementCountForKeyType(appratingUseCount, canPromptForRating: true);
+    }
+    
+    fileprivate func _incrementCountForKeyType(_ keyString: String, canPromptForRating: Bool) {
+        
         let incrementKey = keyForAppRatingKeyString(keyString);
         
-        let bundleVersionKey = kCFBundleVersionKey as String
         // App's version. Not settable as the other ivars because that would be crazy.
-        let currentVersion = Bundle.main.object(forInfoDictionaryKey: bundleVersionKey) as? String
-        if currentVersion == nil {
-            assertionFailure("Could not read kCFBundleVersionKey from InfoDictionary")
-            return
-        }
+        let currentVersion = getAppVersion();
         
         // Get the version number that we've been tracking thus far
         let currentVersionKey = keyForAppRatingKeyString(appratingCurrentVersion)
@@ -552,6 +639,7 @@ open class AppRatingManager : NSObject {
             userDefaultsObject.set(currentVersion as AnyObject?, forKey: currentVersionKey)
         }
         
+        debugLog("Current version : \(currentVersion)")
         debugLog("Tracking version: \(trackingVersion!)")
         
         if trackingVersion == currentVersion {
@@ -574,11 +662,11 @@ open class AppRatingManager : NSObject {
         } else if tracksNewVersions {
             // it's a new version of the app, so restart tracking
             resetAllCounters()
-            debugLog("Reset Tracking Version to: \(trackingVersion!)")
+            debugLog("Reset Tracking Version to: \(currentVersion)")
         }
         
         userDefaultsObject.synchronize()
-        if (ratingConditionsHaveBeenMet()) {
+        if (canPromptForRating && ratingConditionsHaveBeenMet()) {
             showRatingAlert();
         }
     }
@@ -589,8 +677,7 @@ open class AppRatingManager : NSObject {
         
         let currentVersionKey = keyForAppRatingKeyString(appratingCurrentVersion);
         let trackingVersion: String? = userDefaultsObject.string(forKey: currentVersionKey)
-        let bundleVersionKey = kCFBundleVersionKey as String
-        let currentVersion = Bundle.main.object(forInfoDictionaryKey: bundleVersionKey) as? String
+        let currentVersion = getAppVersion();
         
         userDefaultsObject.set(trackingVersion as AnyObject?, forKey: keyForAppRatingKeyString(appratingPreviousVersion))
         userDefaultsObject.set(userDefaultsObject.object(forKey: keyForAppRatingKeyString(appratingRatedCurrentVersion)), forKey: keyForAppRatingKeyString(appratingRatedPreviousVersion))
