@@ -173,7 +173,7 @@ open class AppRating {
      *
      * - Parameter significantEventsUntilPrompt: Number of significant events needed
      */
-    open static func significantEventsUntilPrompt(significantEventsUntilPrompt: Int) {
+    open static func significantEventsUntilPrompt(_ significantEventsUntilPrompt: Int) {
         AppRating.manager.significantEventsUntilPrompt = significantEventsUntilPrompt
     }
     
@@ -555,6 +555,8 @@ open class AppRatingManager : NSObject {
         
         // check if the user has done enough significant events
         let significantEventCount = userDefaultsObject.integer(forKey: keyForAppRatingKeyString(appratingSignificantEventCount))
+        self.debugLog(String(significantEventCount));
+        self.debugLog(String(significantEventsUntilPrompt));
         if significantEventCount < significantEventsUntilPrompt {
             self.debugLog("ratingConditionsHaveBeenMet: not enough sigificant events!")
             return false
@@ -602,26 +604,19 @@ open class AppRatingManager : NSObject {
     
     fileprivate func userDidSignificantEvent(canPromptForRating: Bool) {
         DispatchQueue.global(qos: .background).async {
-            self.incrementSignificantEventAndRate(canPromptForRating: canPromptForRating)
+            self.incrementSignificantEventCount(canPromptForRating: canPromptForRating)
         }
     }
     
-    fileprivate func incrementSignificantEventAndRate(canPromptForRating: Bool) {
-        incrementSignificantEventCount()
-        if (canPromptForRating) {
-            self.showRatingAlert();
-        }
-    }
-    
-    fileprivate func incrementSignificantEventCount() {
-        _incrementCountForKeyType(appratingSignificantEventCount)
+    fileprivate func incrementSignificantEventCount(canPromptForRating: Bool) {
+        _incrementCountForKeyType(appratingSignificantEventCount, canPromptForRating: canPromptForRating);
     }
     
     fileprivate func incrementUseCount() {
-        _incrementCountForKeyType(appratingUseCount)
+        _incrementCountForKeyType(appratingUseCount, canPromptForRating: true);
     }
     
-    fileprivate func _incrementCountForKeyType(_ keyString: String) {
+    fileprivate func _incrementCountForKeyType(_ keyString: String, canPromptForRating: Bool) {
        
         let incrementKey = keyForAppRatingKeyString(keyString);
         
@@ -668,7 +663,7 @@ open class AppRatingManager : NSObject {
         }
         
         userDefaultsObject.synchronize()
-        if (ratingConditionsHaveBeenMet()) {
+        if (canPromptForRating && ratingConditionsHaveBeenMet()) {
             showRatingAlert();
         }
     }
