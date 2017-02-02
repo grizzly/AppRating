@@ -564,8 +564,6 @@ open class AppRatingManager : NSObject {
         
         // check if the user has done enough significant events
         let significantEventCount = userDefaultsObject.integer(forKey: keyForAppRatingKeyString(appratingSignificantEventCount))
-        self.debugLog(String(significantEventCount));
-        self.debugLog(String(significantEventsUntilPrompt));
         if significantEventCount < significantEventsUntilPrompt {
             self.debugLog("ratingConditionsHaveBeenMet: not enough sigificant events!")
             return false
