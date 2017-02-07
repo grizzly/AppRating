@@ -48,8 +48,9 @@ open class AppRating {
      * the user if she/he wants to rate the app.
      */
     open static func showRatingAlert() {
-        DispatchQueue.main.async {
-            AppRating.manager.showRatingAlert()
+        let seconds : Double = 2;
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+            AppRating.manager.showRatingAlert();
         }
     }
     
