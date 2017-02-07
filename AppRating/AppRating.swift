@@ -48,10 +48,7 @@ open class AppRating {
      * the user if she/he wants to rate the app.
      */
     open static func showRatingAlert() {
-        let seconds : Double = 2;
-        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
-            AppRating.manager.showRatingAlert();
-        }
+        AppRating.manager.showRatingAlert();
     }
     
     // MARK: -
@@ -362,42 +359,45 @@ open class AppRatingManager : NSObject {
     
     fileprivate func showRatingAlert() {
         
-        if (false && useSKStoreReviewController && self.defaultOpensInSKStoreReviewController()) {
-            if #available(iOS 10.3, *) {
-                //SKStoreReviewController.requestReview();
-                self.setUserHasRatedApp();
-            }
-        } else {
-            
-            let alertView : UIAlertController = UIAlertController(title: defaultReviewTitle(), message: defaultReviewMessage(), preferredStyle: UIAlertControllerStyle.alert)
-            alertView.addAction(UIAlertAction(title: defaultCancelButtonTitle(), style:UIAlertActionStyle.cancel, handler: {
-                (alert: UIAlertAction!) in
-                self.dontRate()
-            }))
-            if (showsRemindButton()) {
-                if let defaultremindtitle = defaultRemindButtonTitle() {
-                    alertView.addAction(UIAlertAction(title: defaultremindtitle, style:UIAlertActionStyle.default, handler: {
-                        (alert: UIAlertAction!) in
-                        self.remindMeLater()
-                    }))
+        let seconds : Double = 2;
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+            if (false && self.useSKStoreReviewController && self.defaultOpensInSKStoreReviewController()) {
+                if #available(iOS 10.3, *) {
+                    //SKStoreReviewController.requestReview();
+                    self.setUserHasRatedApp();
                 }
-            }
-            alertView.addAction(UIAlertAction(title: defaultRateButtonTitle(), style:UIAlertActionStyle.default, handler: {
-                (alert: UIAlertAction!) in
-                self._rateApp()
-            }))
-            
-            // get the top most controller (= the StoreKit Controller) and dismiss it
-            if let presentingController = UIApplication.shared.keyWindow?.rootViewController {
-                if let topController = topMostViewController(presentingController) {
-                    topController.present(alertView, animated: usesAnimation) {
-                        self.debugLog("presentViewController() completed")
+            } else {
+                
+                let alertView : UIAlertController = UIAlertController(title: self.defaultReviewTitle(), message: self.defaultReviewMessage(), preferredStyle: UIAlertControllerStyle.alert)
+                alertView.addAction(UIAlertAction(title: self.defaultCancelButtonTitle(), style:UIAlertActionStyle.cancel, handler: {
+                    (alert: UIAlertAction!) in
+                    self.dontRate()
+                }))
+                if (self.showsRemindButton()) {
+                    if let defaultremindtitle = self.defaultRemindButtonTitle() {
+                        alertView.addAction(UIAlertAction(title: defaultremindtitle, style:UIAlertActionStyle.default, handler: {
+                            (alert: UIAlertAction!) in
+                            self.remindMeLater()
+                        }))
                     }
                 }
-                // note that tint color has to be set after the controller is presented in order to take effect (last checked in iOS 9.3)
-                alertView.view.tintColor = tintColor
+                alertView.addAction(UIAlertAction(title: self.defaultRateButtonTitle(), style:UIAlertActionStyle.default, handler: {
+                    (alert: UIAlertAction!) in
+                    self._rateApp()
+                }))
+                
+                // get the top most controller (= the StoreKit Controller) and dismiss it
+                if let presentingController = UIApplication.shared.keyWindow?.rootViewController {
+                    if let topController = self.topMostViewController(presentingController) {
+                        topController.present(alertView, animated: self.usesAnimation) {
+                            self.debugLog("presentViewController() completed")
+                        }
+                    }
+                    // note that tint color has to be set after the controller is presented in order to take effect (last checked in iOS 9.3)
+                    alertView.view.tintColor = self.tintColor
+                }
+                self.ratingAlert = alertView;
             }
-            self.ratingAlert = alertView;
         }
         
     }
