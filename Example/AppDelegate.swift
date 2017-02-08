@@ -28,6 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // set some of the settings (see the github readme for more information about that)
         AppRating.daysUntilPrompt(0);
         AppRating.usesUntilPrompt(2);
+        AppRating.secondsBeforePromptIsShown(3);
         AppRating.significantEventsUntilPrompt(0); // set this to zero if you dont't want to use this feature
         
         
