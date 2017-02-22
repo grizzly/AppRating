@@ -328,7 +328,7 @@ open class AppRatingManager : NSObject {
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
     fileprivate var currentVersion = "0.0.0";
     fileprivate var ratingAlert: UIAlertController? = nil
-    fileprivate let reviewURLTemplate  = "https://itunes.apple.com/us/app/x/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
+    fileprivate let reviewURLTemplate  = "https://itunes.apple.com/app/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
     
     // MARK: -
     // MARK: Optional Closures
