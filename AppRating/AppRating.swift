@@ -311,7 +311,7 @@ open class AppRatingManager : NSObject {
     public var appName : String = "";
     public var daysUntilPrompt : Int = 3;
     public var usesUntilPrompt : Int = 3;
-    public var daysBeforeReminding : Int = 1;
+    public var daysBeforeReminding : Int = 7;
     public var significantEventsUntilPrompt : Int = 0;
     public var secondsBeforePromptIsShown : Double = 2;
     public var tracksNewVersions : Bool = true;
@@ -376,7 +376,7 @@ open class AppRatingManager : NSObject {
             if (self.useSKStoreReviewController && self.defaultOpensInSKStoreReviewController()) {
                 if #available(iOS 10.3, *) {
                     SKStoreReviewController.requestReview();
-                    self.setUserHasRatedApp();
+                    self.remindMeLater();
                 }
             } else {
                 if (self.ratingAlert == nil) {
