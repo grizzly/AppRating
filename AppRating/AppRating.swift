@@ -30,12 +30,12 @@ import SystemConfiguration
 open class AppRating: NSObject {
     
     private static var appID : String = "";
-
+    
     // MARK: -
     // MARK: Public Functions
     
     /**
-     * Explicit call to start the rating process. 
+     * Explicit call to start the rating process.
      * Should only be called directly on a user interaction like
      * pressing a "Please rate this app" button
      */
@@ -65,7 +65,6 @@ open class AppRating: NSObject {
         AppRating.manager.appID = appID
     }
 
-    
     /**
      * Singleton instance of the underlaying rating manager.
      */
@@ -92,7 +91,7 @@ open class AppRating: NSObject {
      * ask the user for a rating. If you ask people after some
      * days only, the chance for getting better ratings is higher.
      * People who don't like your app will delete it mostly within
-     * 1 day. 
+     * 1 day.
      *
      * - Parameter daysUntilPrompt: Number of days until Prompt
      */
@@ -114,7 +113,7 @@ open class AppRating: NSObject {
         return AppRating.manager.usesUntilPrompt
     }
 
-    
+
     /**
      * Sets the number of uses needed before the app asks the user
      * to rate the app
@@ -139,7 +138,7 @@ open class AppRating: NSObject {
     
     /**
      * Sets the number of days needed before the app asks the user
-     * to rate the app again (after the user has pressed 'remind me 
+     * to rate the app again (after the user has pressed 'remind me
      * later'
      *
      * - Parameter daysBeforeReminding: Number of days before asking again
@@ -167,7 +166,7 @@ open class AppRating: NSObject {
     
     /**
      * Sets the number of significant events needed before the app asks the user
-     * to rate the app 
+     * to rate the app
      *
      * - Parameter significantEventsUntilPrompt: Number of significant events needed
      */
@@ -207,10 +206,10 @@ open class AppRating: NSObject {
     open static func useMainAppBundleForLocalizations(_ useMainAppBundleForLocalizations: Bool) {
         AppRating.manager.useMainAppBundleForLocalizations = useMainAppBundleForLocalizations
     }
- 
     
+
     /**
-     * Enables the debug mode, so a lot of information is printed out to 
+     * Enables the debug mode, so a lot of information is printed out to
      * the console
      * Default => false.
      */
@@ -247,7 +246,7 @@ open class AppRating: NSObject {
     
     /**
      * Availabe for iOS 10.3+ 
-     * Will use the new Apple App Rating Feature if 
+     * Will use the new Apple App Rating Feature if
      * set to true. Apple decides wheter it is the right
      * time to present the review screen, so it may not be
      * displayed also when the conditions will be met.
@@ -298,7 +297,25 @@ open class AppRating: NSObject {
     open static func userDidSignificantEvent(canPromptForRating: Bool) {
         self.manager.userDidSignificantEvent(canPromptForRating: canPromptForRating)
     }
-
+    
+    // MARK: Events
+    
+    /**
+     * Tells AppRating that the user performed a significant event.
+     * A significant event is whatever you want it to be. If you're app is used
+     * to make VoIP calls, then you might want to call this method whenever the
+     * user places a call. If it's a game, you might want to call this whenever
+     * the user beats a level boss.
+     *
+     * If the user has performed enough significant events and used the app enough,
+     * you can suppress the rating alert by passing false for canPromptForRating. The
+     * rating alert will simply be postponed until it is called again with true for
+     * canPromptForRating.
+     */
+    open static func userDidSignificantEvent(canPromptForRating: Bool) {
+        self.manager.userDidSignificantEvent(canPromptForRating: canPromptForRating)
+    }
+    
     
 }
 
@@ -322,7 +339,7 @@ open class AppRatingManager : NSObject {
     public var useSKStoreReviewController : Bool = true;
     public var ratingConditionsAlwaysTrue: Bool = false;
     public var debugEnabled : Bool = false;
-
+    
     
     fileprivate var userDefaultsObject = UserDefaults.standard;
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
@@ -640,7 +657,7 @@ open class AppRatingManager : NSObject {
     }
     
     fileprivate func _incrementCountForKeyType(_ keyString: String, canPromptForRating: Bool) {
-       
+
         let incrementKey = keyForAppRatingKeyString(keyString);
         
         // App's version. Not settable as the other ivars because that would be crazy.
