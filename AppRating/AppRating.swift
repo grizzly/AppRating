@@ -42,15 +42,13 @@ open class AppRating: NSObject {
     open static func rate() {
         AppRating.manager.rateApp();
     }
-    
+
     /**
      * Explicit call to show the AlertView, asking
      * the user if she/he wants to rate the app.
      */
     open static func showRatingAlert() {
-        DispatchQueue.main.async {
-            AppRating.manager.showRatingAlert()
-        }
+        AppRating.manager.showRatingAlert();
     }
     
     // MARK: -
@@ -66,8 +64,7 @@ open class AppRating: NSObject {
         AppRating.appID = appID
         AppRating.manager.appID = appID
     }
-    
-    
+
     /**
      * Singleton instance of the underlaying rating manager.
      */
@@ -88,9 +85,9 @@ open class AppRating: NSObject {
     open static func daysUntilPrompt() -> Int {
         return AppRating.manager.daysUntilPrompt
     }
-    
+
     /**
-     * Used to set the number of days before the app should
+     * Used to set the number of days before the app should 
      * ask the user for a rating. If you ask people after some
      * days only, the chance for getting better ratings is higher.
      * People who don't like your app will delete it mostly within
@@ -115,8 +112,8 @@ open class AppRating: NSObject {
     open static func usesUntilPrompt() -> Int {
         return AppRating.manager.usesUntilPrompt
     }
-    
-    
+
+
     /**
      * Sets the number of uses needed before the app asks the user
      * to rate the app
@@ -210,7 +207,7 @@ open class AppRating: NSObject {
         AppRating.manager.useMainAppBundleForLocalizations = useMainAppBundleForLocalizations
     }
     
-    
+
     /**
      * Enables the debug mode, so a lot of information is printed out to
      * the console
@@ -248,7 +245,7 @@ open class AppRating: NSObject {
     }
     
     /**
-     * Availabe for iOS 10.3+
+     * Availabe for iOS 10.3+ 
      * Will use the new Apple App Rating Feature if
      * set to true. Apple decides wheter it is the right
      * time to present the review screen, so it may not be
@@ -268,6 +265,19 @@ open class AppRating: NSObject {
     
     open static func useSKStoreReviewController(_ newstatus: Bool) {
         self.manager.useSKStoreReviewController = newstatus;
+    }
+    
+    /**
+     * If the conditions have met to show up the rating alert, a number
+     * of seconds is waited before the alert is shown. Use this to avoid
+     * showing the alert to early (for example if the app is still loading
+     * data)
+     * Default => 2 seconds
+     * - Parameter seconds: number of seconds to wait until prompt is shown
+     */
+    
+    open static func secondsBeforePromptIsShown(_ seconds: Double) {
+        self.manager.secondsBeforePromptIsShown = seconds;
     }
     
     // MARK: Events
@@ -300,8 +310,9 @@ open class AppRatingManager : NSObject {
     public var appName : String = "";
     public var daysUntilPrompt : Int = 3;
     public var usesUntilPrompt : Int = 3;
-    public var daysBeforeReminding : Int = 1;
+    public var daysBeforeReminding : Int = 7;
     public var significantEventsUntilPrompt : Int = 0;
+    public var secondsBeforePromptIsShown : Double = 2;
     public var tracksNewVersions : Bool = true;
     public var shouldPromptIfRated : Bool = true;
     public var useMainAppBundleForLocalizations : Bool = false;
@@ -324,8 +335,7 @@ open class AppRatingManager : NSObject {
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
     fileprivate var currentVersion = "0.0.0";
     fileprivate var ratingAlert: UIAlertController? = nil
-    fileprivate let reviewURLTemplate  = "https://itunes.apple.com/us/app/x/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
-    
+    fileprivate let reviewURLTemplate  = "https://itunes.apple.com/app/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
     
     // MARK: -
     // MARK: Initialization
@@ -359,43 +369,48 @@ open class AppRatingManager : NSObject {
     }
     
     fileprivate func showRatingAlert() {
-        
-        if (useSKStoreReviewController && self.defaultOpensInSKStoreReviewController()) {
-            if #available(iOS 10.3, *) {
-                SKStoreReviewController.requestReview();
-                self.setUserHasRatedApp();
-            }
-        } else {
-            
-            let alertView : UIAlertController = UIAlertController(title: defaultReviewTitle(), message: defaultReviewMessage(), preferredStyle: UIAlertControllerStyle.alert)
-            alertView.addAction(UIAlertAction(title: defaultCancelButtonTitle(), style:UIAlertActionStyle.cancel, handler: {
-                (alert: UIAlertAction!) in
-                self.dontRate()
-            }))
-            if (showsRemindButton()) {
-                if let defaultremindtitle = defaultRemindButtonTitle() {
-                    alertView.addAction(UIAlertAction(title: defaultremindtitle, style:UIAlertActionStyle.default, handler: {
+        DispatchQueue.main.asyncAfter(deadline: .now() + self.secondsBeforePromptIsShown) {
+            if (self.useSKStoreReviewController && self.defaultOpensInSKStoreReviewController()) {
+                if #available(iOS 10.3, *) {
+                    SKStoreReviewController.requestReview();
+                    self.remindMeLater();
+                }
+            } else {
+                if (self.ratingAlert == nil) {
+                    let alertView : UIAlertController = UIAlertController(title: self.defaultReviewTitle(), message: self.defaultReviewMessage(), preferredStyle: UIAlertControllerStyle.alert)
+                    alertView.addAction(UIAlertAction(title: self.defaultCancelButtonTitle(), style:UIAlertActionStyle.cancel, handler: {
                         (alert: UIAlertAction!) in
-                        self.remindMeLater()
+                        self.dontRate();
+                        self.hideRatingAlert();
                     }))
-                }
-            }
-            alertView.addAction(UIAlertAction(title: defaultRateButtonTitle(), style:UIAlertActionStyle.default, handler: {
-                (alert: UIAlertAction!) in
-                self._rateApp()
-            }))
-            
-            // get the top most controller (= the StoreKit Controller) and dismiss it
-            if let presentingController = UIApplication.shared.keyWindow?.rootViewController {
-                if let topController = topMostViewController(presentingController) {
-                    topController.present(alertView, animated: usesAnimation) {
-                        self.debugLog("presentViewController() completed")
+                    if (self.showsRemindButton()) {
+                        if let defaultremindtitle = self.defaultRemindButtonTitle() {
+                            alertView.addAction(UIAlertAction(title: defaultremindtitle, style:UIAlertActionStyle.default, handler: {
+                                (alert: UIAlertAction!) in
+                                self.remindMeLater();
+                                self.hideRatingAlert();
+                            }))
+                        }
                     }
+                    alertView.addAction(UIAlertAction(title: self.defaultRateButtonTitle(), style:UIAlertActionStyle.default, handler: {
+                        (alert: UIAlertAction!) in
+                        self._rateApp();
+                        self.hideRatingAlert();
+                    }))
+                    
+                    // get the top most controller (= the StoreKit Controller) and dismiss it
+                    if let presentingController = UIApplication.shared.keyWindow?.rootViewController {
+                        if let topController = self.topMostViewController(presentingController) {
+                            topController.present(alertView, animated: self.usesAnimation) {
+                                self.debugLog("presentViewController() completed")
+                            }
+                        }
+                        // note that tint color has to be set after the controller is presented in order to take effect (last checked in iOS 9.3)
+                        alertView.view.tintColor = self.tintColor
+                    }
+                    self.ratingAlert = alertView;
                 }
-                // note that tint color has to be set after the controller is presented in order to take effect (last checked in iOS 9.3)
-                alertView.view.tintColor = tintColor
             }
-            self.ratingAlert = alertView;
         }
         
     }
@@ -623,7 +638,7 @@ open class AppRatingManager : NSObject {
     }
     
     fileprivate func _incrementCountForKeyType(_ keyString: String, canPromptForRating: Bool) {
-        
+
         let incrementKey = keyForAppRatingKeyString(keyString);
         
         // App's version. Not settable as the other ivars because that would be crazy.
@@ -699,11 +714,14 @@ open class AppRatingManager : NSObject {
     // MARK: Notification Handlers
     
     @objc public func appWillResignActive(_ notification: Notification) {
-        self.debugLog("appWillResignActive:")
         hideRatingAlert()
+        DispatchQueue.global(qos: .background).async {
+            self.debugLog("appWillResignActive:")
+        };
     }
     
     @objc public func applicationDidFinishLaunching(_ notification: Notification) {
+        hideRatingAlert()
         DispatchQueue.global(qos: .background).async {
             self.debugLog("applicationDidFinishLaunching:")
             self.incrementUseCount();
@@ -711,6 +729,7 @@ open class AppRatingManager : NSObject {
     }
     
     @objc public func applicationWillEnterForeground(_ notification: Notification) {
+        hideRatingAlert()
         DispatchQueue.global(qos: .background).async {
             self.debugLog("applicationWillEnterForeground:")
             self.incrementUseCount();
@@ -733,6 +752,32 @@ open class AppRatingManager : NSObject {
         reviewURL = reviewURL.replacingOccurrences(of: "AFFILIATE_CAMPAIGN_CODE", with: "\(affiliateCampaignCode)")
         debugLog(reviewURL)
         return reviewURL
+    }
+    
+    // MARK: -
+    // MARK: Internet Connectivity
+    
+    private func connectedToNetwork() -> Bool {
+        var zeroAddress = sockaddr_in()
+        zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
+        zeroAddress.sin_family = sa_family_t(AF_INET)
+        
+        guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                SCNetworkReachabilityCreateWithAddress(nil, $0)
+            }
+        }) else {
+            return false
+        }
+        
+        var flags : SCNetworkReachabilityFlags = []
+        if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
+            return false
+        }
+        
+        let isReachable = flags.contains(.reachable)
+        let needsConnection = flags.contains(.connectionRequired)
+        return (isReachable && !needsConnection)
     }
     
     // MARK: -
