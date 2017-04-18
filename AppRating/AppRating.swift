@@ -27,7 +27,7 @@ import StoreKit
 import SystemConfiguration
 
 
-open class AppRating {
+open class AppRating: NSObject {
     
     private static var appID : String = "";
 

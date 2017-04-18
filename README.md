@@ -1,11 +1,11 @@
 ## AppRating - iOS App Rating for Swift 3
 
-AppRating is a simple yet powerful App Review Manager for iOS and OSX written in Swift. It is based on [Armchair](https://raw.githubusercontent.com/UrbanApps/Armchair/) but mainly rewritten for Swift3.
+AppRating is a simple yet powerful App Review Manager for iOS and OSX written in Swift. It is based on [Armchair](https://github.com/UrbanApps/Armchair) but mainly rewritten for Swift3.
 
 ## What's new?
 
 - SKStoreReviewController - Now supporting the brand new iOS 10.3 API SKStoreReviewController which makes it really easy to get a huge number of ratings for your app. It opens the rating directly in an alert:
-- **IMPORTANT** : SKStoreReviewController is only available for Xcode 8.3+, if you want to test, please checkout the iOS_10.3 branch (see cocoapods installation guide below).
+- **IMPORTANT** : No more need to use the iOS_10.3 branch for getting the SKStoreReviewController version of this library, just use the main branch.
 
 ![AppRating supports the brand new SKStoreReviewController API](https://pbs.twimg.com/media/C3BFBGMWEAAL5Di.png)
 
@@ -45,17 +45,6 @@ Then, run the following command:
 ```bash
 $ pod install
 ```
-
-If you want to test SKStoreReviewController, use the iOS_10.3 branch:
-
-```ruby
-source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '9.0'
-use_frameworks!
-
-pod 'AppRating', git: 'https://github.com/grizzly/AppRating.git', branch: 'iOS_10.3'
-```
-
 
 ## Usage
 
