@@ -27,7 +27,7 @@ import StoreKit
 import SystemConfiguration
 
 
-open class AppRating {
+open class AppRating: NSObject {
     
     private static var appID : String = "";
     
@@ -311,21 +311,20 @@ open class AppRatingManager : NSObject {
     public var ratingConditionsAlwaysTrue: Bool = false;
     public var debugEnabled : Bool = false;
     
+    // MARK: -
+    // MARK: Optional Closures
+    
+    public typealias AppRatingClosure = () -> ()
+    public var didDisplayAlertClosure: AppRatingClosure?
+    public var didDeclineToRateClosure: AppRatingClosure?
+    public var didOptToRateClosure: AppRatingClosure?
+    public var didOptToRemindLaterClosure: AppRatingClosure?
     
     fileprivate var userDefaultsObject = UserDefaults.standard;
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
     fileprivate var currentVersion = "0.0.0";
     fileprivate var ratingAlert: UIAlertController? = nil
     fileprivate let reviewURLTemplate  = "https://itunes.apple.com/us/app/x/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
-    
-    // MARK: -
-    // MARK: Optional Closures
-    
-    public typealias AppRatingClosure = () -> ()
-    var didDisplayAlertClosure: AppRatingClosure?
-    var didDeclineToRateClosure: AppRatingClosure?
-    var didOptToRateClosure: AppRatingClosure?
-    var didOptToRemindLaterClosure: AppRatingClosure?
     
     
     // MARK: -
