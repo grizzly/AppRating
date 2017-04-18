@@ -334,11 +334,10 @@ open class AppRatingManager : NSObject {
     // MARK: Optional Closures
     
     public typealias AppRatingClosure = () -> ()
-    var didDisplayAlertClosure: AppRatingClosure?
-    var didDeclineToRateClosure: AppRatingClosure?
-    var didOptToRateClosure: AppRatingClosure?
-    var didOptToRemindLaterClosure: AppRatingClosure?
-
+    public var didDisplayAlertClosure: AppRatingClosure?
+    public var didDeclineToRateClosure: AppRatingClosure?
+    public var didOptToRateClosure: AppRatingClosure?
+    public var didOptToRemindLaterClosure: AppRatingClosure?
     
     // MARK: -
     // MARK: Initialization
