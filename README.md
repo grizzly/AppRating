@@ -5,7 +5,6 @@ AppRating is a simple yet powerful App Review Manager for iOS and OSX written in
 ## What's new?
 
 - SKStoreReviewController - Now supporting the brand new iOS 10.3 API SKStoreReviewController which makes it really easy to get a huge number of ratings for your app. It opens the rating directly in an alert:
-- **IMPORTANT** : No more need to use the iOS_10.3 branch for getting the SKStoreReviewController version of this library, just use the main branch.
 
 ![AppRating supports the brand new SKStoreReviewController API](https://pbs.twimg.com/media/C3BFBGMWEAAL5Di.png)
 
@@ -45,6 +44,24 @@ Then, run the following command:
 ```bash
 $ pod install
 ```
+### Carthage
+
+[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
+
+You can install Carthage with [Homebrew](http://brew.sh/) using the following command:
+
+```bash
+$ brew update
+$ brew install carthage
+```
+
+To integrate AppRating into your Xcode project using Carthage, specify it in your `Cartfile`:
+
+```ogdl
+github "grizzly/AppRating"
+```
+
+Run `carthage update` to build the framework and drag the built `AppRating.framework` into your Xcode project.
 
 ## Usage
 
