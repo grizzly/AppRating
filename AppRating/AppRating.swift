@@ -351,9 +351,9 @@ open class AppRatingManager : NSObject {
     // MARK: Singleton Instance Setup
     
     fileprivate func setupNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.appWillResignActive(_:)),            name: NSNotification.Name.UIApplicationWillResignActive,    object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationDidFinishLaunching(_:)),  name: NSNotification.Name.UIApplicationDidFinishLaunching,  object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationWillEnterForeground(_:)), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.appWillResignActive(_:)),            name: UIApplication.willResignActiveNotification,    object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationDidFinishLaunching(_:)),  name: UIApplication.didFinishLaunchingNotification,  object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationWillEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
     
     // MARK: -
@@ -377,22 +377,22 @@ open class AppRatingManager : NSObject {
                 }
             } else {
                 if (self.ratingAlert == nil) {
-                    let alertView : UIAlertController = UIAlertController(title: self.defaultReviewTitle(), message: self.defaultReviewMessage(), preferredStyle: UIAlertControllerStyle.alert)
-                    alertView.addAction(UIAlertAction(title: self.defaultCancelButtonTitle(), style:UIAlertActionStyle.cancel, handler: {
+                    let alertView : UIAlertController = UIAlertController(title: self.defaultReviewTitle(), message: self.defaultReviewMessage(), preferredStyle: UIAlertController.Style.alert)
+                    alertView.addAction(UIAlertAction(title: self.defaultCancelButtonTitle(), style:UIAlertAction.Style.cancel, handler: {
                         (alert: UIAlertAction!) in
                         self.dontRate();
                         self.hideRatingAlert();
                     }))
                     if (self.showsRemindButton()) {
                         if let defaultremindtitle = self.defaultRemindButtonTitle() {
-                            alertView.addAction(UIAlertAction(title: defaultremindtitle, style:UIAlertActionStyle.default, handler: {
+                            alertView.addAction(UIAlertAction(title: defaultremindtitle, style:UIAlertAction.Style.default, handler: {
                                 (alert: UIAlertAction!) in
                                 self.remindMeLater();
                                 self.hideRatingAlert();
                             }))
                         }
                     }
-                    alertView.addAction(UIAlertAction(title: self.defaultRateButtonTitle(), style:UIAlertActionStyle.default, handler: {
+                    alertView.addAction(UIAlertAction(title: self.defaultRateButtonTitle(), style:UIAlertAction.Style.default, handler: {
                         (alert: UIAlertAction!) in
                         self._rateApp();
                         self.hideRatingAlert();
@@ -843,11 +843,11 @@ open class AppRatingManager : NSObject {
     private func getRootViewController() -> UIViewController? {
         if var window = UIApplication.shared.keyWindow {
             
-            if window.windowLevel != UIWindowLevelNormal {
+            if window.windowLevel != UIWindow.Level.normal {
                 let windows: NSArray = UIApplication.shared.windows as NSArray
                 for candidateWindow in windows {
                     if let candidateWindow = candidateWindow as? UIWindow {
-                        if candidateWindow.windowLevel == UIWindowLevelNormal {
+                        if candidateWindow.windowLevel == UIWindow.Level.normal {
                             window = candidateWindow
                             break
                         }
