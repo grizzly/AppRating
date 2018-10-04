@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
   spec.name = "AppRating"
-  spec.version = "1.4.0"
-  spec.summary = "A simple yet powerful App Review Manager for iOS in Swift 4. Now supporting SKStoreReviewController API. Based on ArmChair."
+  spec.version = "1.4.1"
+  spec.summary = "A simple yet powerful App Review Manager for iOS in Swift 4.2. Now supporting SKStoreReviewController API. Based on ArmChair."
   spec.description = <<-DESC
     A simple yet powerful App Review Manager for iOS and OSX in Swift.
     * 100% Swift 4
