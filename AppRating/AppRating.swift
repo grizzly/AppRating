@@ -362,9 +362,17 @@ open class AppRatingManager : NSObject {
     fileprivate func rateApp() {
         self.setUserHasRatedApp();
         if (defaultOpensInStoreKit()) {
-            UIApplication.shared.openURL(URL(string: reviewURLString())!)
+            if #available(iOS 10.3, *) {
+                UIApplication.shared.open(URL(string: reviewURLString())!, options: [:], completionHandler: nil);
+            } else {
+               UIApplication.shared.openURL(URL(string: reviewURLString())!)
+            }
         } else {
-            UIApplication.shared.openURL(URL(string: reviewURLString())!)
+            if #available(iOS 10.3, *) {
+                UIApplication.shared.open(URL(string: reviewURLString())!, options: [:], completionHandler: nil);
+            } else {
+                UIApplication.shared.openURL(URL(string: reviewURLString())!)
+            }
         }
     }
     
