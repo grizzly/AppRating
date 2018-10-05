@@ -27,7 +27,7 @@ import StoreKit
 import SystemConfiguration
 
 
-open class AppRating: NSObject {
+@objc open class AppRating: NSObject {
     
     private static var appID : String = "";
     
@@ -39,7 +39,7 @@ open class AppRating: NSObject {
      * Should only be called directly on a user interaction like
      * pressing a "Please rate this app" button
      */
-    public static func rate() {
+    @objc public static func rate() {
         AppRating.manager.rateApp();
     }
 
@@ -47,7 +47,7 @@ open class AppRating: NSObject {
      * Explicit call to show the AlertView, asking
      * the user if she/he wants to rate the app.
      */
-    public static func showRatingAlert() {
+    @objc public static func showRatingAlert() {
         AppRating.manager.showRatingAlert();
     }
     
@@ -60,7 +60,7 @@ open class AppRating: NSObject {
      *
      * - Parameter appID: Apple App ID
      */
-    public static func appID(_ appID: String) {
+    @objc public static func appID(_ appID: String) {
         AppRating.appID = appID
         AppRating.manager.appID = appID
     }
@@ -68,7 +68,7 @@ open class AppRating: NSObject {
     /**
      * Singleton instance of the underlaying rating manager.
      */
-    public static let manager : AppRatingManager = {
+    @objc public static let manager : AppRatingManager = {
         assert(AppRating.appID != "", "AppRating.appID(appID: String) has to be the first AppRating call made.")
         struct Singleton {
             static let instance: AppRatingManager = AppRatingManager(appID: AppRating.appID)
@@ -82,7 +82,7 @@ open class AppRating: NSObject {
      * days before they will be prompted to rate it.
      * Default => 3
      */
-    public static func daysUntilPrompt() -> Int {
+    @objc public static func daysUntilPrompt() -> Int {
         return AppRating.manager.daysUntilPrompt
     }
 
@@ -95,7 +95,7 @@ open class AppRating: NSObject {
      *
      * - Parameter daysUntilPrompt: Number of days until Prompt
      */
-    public static func daysUntilPrompt(_ daysUntilPrompt: Int) {
+    @objc public static func daysUntilPrompt(_ daysUntilPrompt: Int) {
         AppRating.manager.daysUntilPrompt = daysUntilPrompt
     }
     
@@ -109,7 +109,7 @@ open class AppRating: NSObject {
      * Default => 3
      */
     
-    public static func usesUntilPrompt() -> Int {
+    @objc public static func usesUntilPrompt() -> Int {
         return AppRating.manager.usesUntilPrompt
     }
 
@@ -120,7 +120,7 @@ open class AppRating: NSObject {
      *
      * - Parameter usesUntilPrompt: Number of days until Prompt
      */
-    public static func usesUntilPrompt(_ usesUntilPrompt: Int) {
+    @objc public static func usesUntilPrompt(_ usesUntilPrompt: Int) {
         AppRating.manager.usesUntilPrompt = usesUntilPrompt
     }
     
@@ -132,7 +132,7 @@ open class AppRating: NSObject {
      * Default => 1
      */
     
-    public static func daysBeforeReminding() -> Int {
+    @objc public static func daysBeforeReminding() -> Int {
         return AppRating.manager.daysBeforeReminding;
     }
     
@@ -143,7 +143,7 @@ open class AppRating: NSObject {
      *
      * - Parameter daysBeforeReminding: Number of days before asking again
      */
-    public static func daysBeforeReminding(_ daysBeforeReminding: Int) {
+    @objc public static func daysBeforeReminding(_ daysBeforeReminding: Int) {
         AppRating.manager.daysBeforeReminding = daysBeforeReminding
     }
     
@@ -160,7 +160,7 @@ open class AppRating: NSObject {
      * a significant event, call the method AppRating.userDidSignificantEvent()
      * Default => 0
      */
-    public static func significantEventsUntilPrompt() -> Int {
+    @objc public static func significantEventsUntilPrompt() -> Int {
         return AppRating.manager.significantEventsUntilPrompt
     }
     
@@ -170,7 +170,7 @@ open class AppRating: NSObject {
      *
      * - Parameter significantEventsUntilPrompt: Number of significant events needed
      */
-    public static func significantEventsUntilPrompt(_ significantEventsUntilPrompt: Int) {
+    @objc public static func significantEventsUntilPrompt(_ significantEventsUntilPrompt: Int) {
         AppRating.manager.significantEventsUntilPrompt = significantEventsUntilPrompt
     }
     
@@ -184,11 +184,11 @@ open class AppRating: NSObject {
      * Default => true
      */
     
-    public static func tracksNewVersions() -> Bool {
+    @objc public static func tracksNewVersions() -> Bool {
         return AppRating.manager.tracksNewVersions
     }
     
-    public static func tracksNewVersions(_ tracksNewVersions: Bool) {
+    @objc public static func tracksNewVersions(_ tracksNewVersions: Bool) {
         AppRating.manager.tracksNewVersions = tracksNewVersions
     }
     
@@ -199,11 +199,11 @@ open class AppRating: NSObject {
      * Default => false.
      */
     
-    public static func useMainAppBundleForLocalizations() -> Bool {
+    @objc public static func useMainAppBundleForLocalizations() -> Bool {
         return AppRating.manager.useMainAppBundleForLocalizations
     }
     
-    public static func useMainAppBundleForLocalizations(_ useMainAppBundleForLocalizations: Bool) {
+    @objc public static func useMainAppBundleForLocalizations(_ useMainAppBundleForLocalizations: Bool) {
         AppRating.manager.useMainAppBundleForLocalizations = useMainAppBundleForLocalizations
     }
     
@@ -214,11 +214,11 @@ open class AppRating: NSObject {
      * Default => false.
      */
     
-    public static func debugEnabled() -> Bool {
+    @objc public static func debugEnabled() -> Bool {
         return self.manager.debugEnabled;
     }
     
-    public static func debugEnabled(_ newstatus: Bool) {
+    @objc public static func debugEnabled(_ newstatus: Bool) {
         self.manager.debugEnabled = newstatus;
     }
     
@@ -228,11 +228,11 @@ open class AppRating: NSObject {
      * Default => false.
      */
     
-    public static func ratingConditionsAlwaysTrue() -> Bool {
+    @objc public static func ratingConditionsAlwaysTrue() -> Bool {
         return self.manager.ratingConditionsAlwaysTrue;
     }
     
-    public static func ratingConditionsAlwaysTrue(_ newstatus: Bool) {
+    @objc public static func ratingConditionsAlwaysTrue(_ newstatus: Bool) {
         self.manager.ratingConditionsAlwaysTrue = newstatus;
     }
     
@@ -240,7 +240,7 @@ open class AppRating: NSObject {
      * Resets all counters. Perfect for testing.
      */
     
-    public static func resetAllCounters() {
+    @objc public static func resetAllCounters() {
         return self.manager.resetAllCounters();
     }
     
@@ -253,7 +253,7 @@ open class AppRating: NSObject {
      * Default => true (for iOS 10.3+)
      */
     
-    public static func useSKStoreReviewController() -> Bool {
+    @objc public static func useSKStoreReviewController() -> Bool {
         return self.manager.useSKStoreReviewController;
     }
     
@@ -263,7 +263,7 @@ open class AppRating: NSObject {
      * - Parameter newstatus: the value
      */
     
-    public static func useSKStoreReviewController(_ newstatus: Bool) {
+    @objc public static func useSKStoreReviewController(_ newstatus: Bool) {
         self.manager.useSKStoreReviewController = newstatus;
     }
     
@@ -276,7 +276,7 @@ open class AppRating: NSObject {
      * - Parameter seconds: number of seconds to wait until prompt is shown
      */
     
-    public static func secondsBeforePromptIsShown(_ seconds: Double) {
+    @objc public static func secondsBeforePromptIsShown(_ seconds: Double) {
         self.manager.secondsBeforePromptIsShown = seconds;
     }
     
@@ -294,7 +294,7 @@ open class AppRating: NSObject {
      * rating alert will simply be postponed until it is called again with true for
      * canPromptForRating.
      */
-    public static func userDidSignificantEvent(canPromptForRating: Bool) {
+    @objc public static func userDidSignificantEvent(canPromptForRating: Bool) {
         self.manager.userDidSignificantEvent(canPromptForRating: canPromptForRating)
     }
     
