@@ -306,30 +306,30 @@ open class AppRatingManager : NSObject {
     // MARK: -
     // MARK: Public Members
     
-    public var appID : String = "";
-    public var appName : String = "";
-    public var daysUntilPrompt : Int = 3;
-    public var usesUntilPrompt : Int = 3;
-    public var daysBeforeReminding : Int = 7;
-    public var significantEventsUntilPrompt : Int = 0;
-    public var secondsBeforePromptIsShown : Double = 2;
-    public var tracksNewVersions : Bool = true;
-    public var shouldPromptIfRated : Bool = true;
-    public var useMainAppBundleForLocalizations : Bool = false;
-    public var usesAnimation : Bool = true;
-    public var tintColor : UIColor?;
-    public var useSKStoreReviewController : Bool = true;
-    public var ratingConditionsAlwaysTrue: Bool = false;
-    public var debugEnabled : Bool = false;
+    @objc public var appID : String = "";
+    @objc public var appName : String = "";
+    @objc public var daysUntilPrompt : Int = 3;
+    @objc public var usesUntilPrompt : Int = 3;
+    @objc public var daysBeforeReminding : Int = 7;
+    @objc public var significantEventsUntilPrompt : Int = 0;
+    @objc public var secondsBeforePromptIsShown : Double = 2;
+    @objc public var tracksNewVersions : Bool = true;
+    @objc public var shouldPromptIfRated : Bool = true;
+    @objc public var useMainAppBundleForLocalizations : Bool = false;
+    @objc public var usesAnimation : Bool = true;
+    @objc public var tintColor : UIColor?;
+    @objc public var useSKStoreReviewController : Bool = true;
+    @objc public var ratingConditionsAlwaysTrue: Bool = false;
+    @objc public var debugEnabled : Bool = false;
     
     // MARK: -
     // MARK: Optional Closures
     
     public typealias AppRatingClosure = () -> ()
-    public var didDisplayAlertClosure: AppRatingClosure?
-    public var didDeclineToRateClosure: AppRatingClosure?
-    public var didOptToRateClosure: AppRatingClosure?
-    public var didOptToRemindLaterClosure: AppRatingClosure?
+    @objc public var didDisplayAlertClosure: AppRatingClosure?
+    @objc public var didDeclineToRateClosure: AppRatingClosure?
+    @objc public var didOptToRateClosure: AppRatingClosure?
+    @objc public var didOptToRemindLaterClosure: AppRatingClosure?
     
     fileprivate var userDefaultsObject = UserDefaults.standard;
     fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
