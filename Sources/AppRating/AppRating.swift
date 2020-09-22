@@ -26,6 +26,9 @@ import Foundation
 import StoreKit
 import SystemConfiguration
 
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 @objc open class AppRating: NSObject {
     
@@ -317,7 +320,9 @@ open class AppRatingManager : NSObject {
     @objc public var shouldPromptIfRated : Bool = true;
     @objc public var useMainAppBundleForLocalizations : Bool = false;
     @objc public var usesAnimation : Bool = true;
+    #if canImport(UIKit)
     @objc public var tintColor : UIColor?;
+    #endif
     @objc public var useSKStoreReviewController : Bool = true;
     @objc public var ratingConditionsAlwaysTrue: Bool = false;
     @objc public var debugEnabled : Bool = false;
@@ -332,9 +337,11 @@ open class AppRatingManager : NSObject {
     @objc public var didOptToRemindLaterClosure: AppRatingClosure?
     
     fileprivate var userDefaultsObject = UserDefaults.standard;
-    fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
     fileprivate var currentVersion = "0.0.0";
+    #if canImport(UIKit)
+    fileprivate var operatingSystemVersion = NSString(string: UIDevice.current.systemVersion).doubleValue;
     fileprivate var ratingAlert: UIAlertController? = nil
+    #endif
     fileprivate let reviewURLTemplate  = "https://itunes.apple.com/app/idAPP_ID?at=AFFILIATE_CODE&ct=AFFILIATE_CAMPAIGN_CODE&action=write-review"
     
     // MARK: -
@@ -351,15 +358,18 @@ open class AppRatingManager : NSObject {
     // MARK: Singleton Instance Setup
     
     fileprivate func setupNotifications() {
+        #if canImport(UIKit)
         NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.appWillResignActive(_:)),            name: UIApplication.willResignActiveNotification,    object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationDidFinishLaunching(_:)),  name: UIApplication.didFinishLaunchingNotification,  object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(AppRatingManager.applicationWillEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
+        #endif
     }
     
     // MARK: -
     // MARK: PRIVATE Functions
     
     fileprivate func rateApp() {
+        #if canImport(UIKit)
         self.setUserHasRatedApp();
         if (defaultOpensInStoreKit()) {
             if #available(iOS 10.3, *) {
@@ -374,9 +384,11 @@ open class AppRatingManager : NSObject {
                 UIApplication.shared.openURL(URL(string: reviewURLString())!)
             }
         }
+        #endif
     }
     
     fileprivate func showRatingAlert() {
+        #if canImport(UIKit)
         DispatchQueue.main.asyncAfter(deadline: .now() + self.secondsBeforePromptIsShown) {
             if (self.useSKStoreReviewController && self.defaultOpensInSKStoreReviewController()) {
                 if #available(iOS 10.3, *) {
@@ -420,7 +432,7 @@ open class AppRatingManager : NSObject {
                 }
             }
         }
-        
+        #endif
     }
     
     fileprivate func setUserHasRatedApp() {
@@ -430,10 +442,12 @@ open class AppRatingManager : NSObject {
     }
     
     private func hideRatingAlert() {
+        #if canImport(UIKit)
         if let alert = ratingAlert {
             alert.dismiss(animated: false, completion: nil);
             ratingAlert = nil
         }
+        #endif
     }
     
     private func dontRate() {
@@ -811,6 +825,7 @@ open class AppRatingManager : NSObject {
     }
     
     
+    #if canImport(UIKit)
     fileprivate func defaultOpensInSKStoreReviewController() -> Bool {
         let version = UIDevice.current.systemVersion.compare("10.3", options: NSString.CompareOptions.numeric);
         switch version {
@@ -820,7 +835,9 @@ open class AppRatingManager : NSObject {
             return false;
         }
     }
+    #endif
     
+    #if canImport(UIKit)
     fileprivate func defaultOpensInStoreKit() -> Bool {
         switch UIDevice.current.systemVersion.compare("10.3.0", options: NSString.CompareOptions.numeric) {
         case .orderedSame, .orderedDescending:
@@ -829,7 +846,9 @@ open class AppRatingManager : NSObject {
             return false;
         }
     }
+    #endif
     
+    #if canImport(UIKit)
     private func topMostViewController(_ controller: UIViewController?) -> UIViewController? {
         var isPresenting: Bool = false
         var topController: UIViewController? = controller
@@ -846,8 +865,11 @@ open class AppRatingManager : NSObject {
         } while isPresenting
         
         return topController
+        
     }
+    #endif
     
+    #if canImport(UIKit)
     private func getRootViewController() -> UIViewController? {
         if var window = UIApplication.shared.keyWindow {
             
@@ -875,6 +897,7 @@ open class AppRatingManager : NSObject {
         
         return nil
     }
+    #endif
     
     // MARK: Tracking Keys with sensible defaults
     
