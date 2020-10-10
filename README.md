@@ -1,11 +1,11 @@
-## AppRating - iOS App Rating for Swift 4.2
+## AppRating - iOS App Rating for Swift 5.0
 
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/AppRating.svg)](https://img.shields.io/cocoapods/v/AppRating.svg)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Platform](https://img.shields.io/cocoapods/p/AppRating.svg?style=flat)](http://cocoadocs.org/docsets/AppRating)
-[![Swift 4.2](https://img.shields.io/badge/Swift-4.2-orange.svg?style=flat)](https://developer.apple.com/swift/)
+[![Swift 5.0](https://img.shields.io/badge/Swift-5.0-orange.svg?style=flat)](https://developer.apple.com/swift/)
 
-AppRating is a simple yet powerful App Review Manager for iOS and OSX written in Swift. It is based on [Armchair](https://github.com/UrbanApps/Armchair) but mainly rewritten for Swift 4.2.
+AppRating is a simple yet powerful App Review Manager for iOS and OSX written in Swift. It is based on [Armchair](https://github.com/UrbanApps/Armchair) but mainly rewritten for Swift 5.0.
 
 ## What's new?
 
