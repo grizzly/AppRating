@@ -7,6 +7,10 @@
 
 AppRating is a simple yet powerful App Review Manager for iOS and OSX written in Swift. It is based on [Armchair](https://github.com/UrbanApps/Armchair) but mainly rewritten for Swift 5.0.
 
+## Flutter Version
+
+https://pub.dev/packages/advanced_in_app_review
+
 ## What's new?
 
 - SKStoreReviewController - Now supporting the brand new iOS 10.3 API SKStoreReviewController which makes it really easy to get a huge number of ratings for your app. It opens the rating directly in an alert:
